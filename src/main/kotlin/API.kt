@@ -6,16 +6,27 @@ import io.ktor.http.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.util.pipeline.*
+import io.ktor.util.*
+import mu.KLogger
 import mu.KotlinLogging
 
+open class ApiSubject(
+    val logger: KLogger
+)
+
+class MangaApiSubject(
+    logger: KLogger,
+    val mangaFolder: MangaFolderService
+) : ApiSubject(logger)
 
 fun Application.apiModule() {
     val klaxon = Klaxon()
-    val logger = KotlinLogging.logger("API module")
-
     val mangaFolderService = MangaFolderService.instance
     routing {
+        var logger = KotlinLogging.logger("API Call")
+        intercept(ApplicationCallPipeline.Setup) {
+            logger = KotlinLogging.logger("API ${call.request.uri}")
+        }
         route("api") {
             get("latest") {
                 val pageNum = (call.request.queryParameters["page"] ?: "0").toInt()
@@ -29,20 +40,20 @@ fun Application.apiModule() {
 
 
             route("manga/{id}") {
+                val mangaIdKey = AttributeKey<String>("mangaId")
+
                 get {
-                    val id = call.parameters["id"] ?: ""
-                    val manga = mangaFolderService.getManga(id)
-                    if (manga != null) {
-                        call.respondText(contentType = ContentType.Application.Json) {
-                            logger.info { "${call.request.uri} Serve ${manga.manga.title}" }
-                            klaxon.toJsonString(manga)
-                        }
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
+                    val mangaId = call.attributes[mangaIdKey]
+                    val manga = mangaFolderService.getManga(mangaId)
+
+                    call.respondText(contentType = ContentType.Application.Json) {
+                        logger.info { "${call.request.uri} Serve ${manga.manga.title}" }
+                        klaxon.toJsonString(manga)
                     }
                 }
+
                 get("{image}") {
-                    val mangaId = call.parameters["id"] ?: ""
+                    val mangaId = call.attributes[mangaIdKey]
                     val imageFileName = call.parameters["image"] ?: ""
                     val file = mangaFolderService.getImage(mangaId, imageFileName)
                     if (file != null) {
@@ -53,15 +64,29 @@ fun Application.apiModule() {
                     }
                 }
                 get("pages") {
-                    val id = call.parameters["id"] ?: ""
+                    val id = call.attributes[mangaIdKey]
                     val pages = mangaFolderService.getPages(id)
-                    if(pages != null){
-                        call.respondText(contentType = ContentType.Application.Json) {
-                            logger.info { "${call.request.uri} listing ${pages.size} pages" }
-                            klaxon.toJsonString(pages)
+                    call.respondText(contentType = ContentType.Application.Json) {
+                        logger.info { "${call.request.uri} listing ${pages.size} pages" }
+                        klaxon.toJsonString(pages)
+                    }
+                }
+                /***
+                 * Validate manga ID beforehand
+                 */
+                intercept(ApplicationCallPipeline.Features) {
+                    val mangaId = this.call.parameters["id"]
+                    if (mangaId == null) {
+                        logger.warn { "Manga ID is missing" }
+                        call.respond(HttpStatusCode.BadRequest, "Missing manga ID")
+                        finish()
+                    } else {
+                        if (!mangaFolderService.containsKey(mangaId)) {
+                            logger.warn { "ID [$mangaId] not found" }
+                            call.respond(HttpStatusCode.NotFound)
+                            finish()
                         }
-                    }else{
-                        call.respond(HttpStatusCode.NotFound)
+                        call.attributes.put(mangaIdKey, mangaId)
                     }
                 }
             }

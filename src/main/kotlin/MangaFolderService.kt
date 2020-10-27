@@ -11,10 +11,17 @@ class MangaFolderService private constructor() {
     }
 
     private val downloadDir = """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download"""
-    private var mangaFolders: List<MangaFolder> = DownloadFolderParser(Paths.get(downloadDir)).parse()
+    private var mangaFolders: Map<String, MangaFolder>
+    init {
+        mangaFolders =  DownloadFolderParser(Paths.get(downloadDir))
+            .parse()
+            .map { it.id to it }
+            .toMap()
+    }
 
     fun getLatestMangas(pageNum: Int, pageSize: Int = 20): MangasPage {
         val chunked = mangaFolders
+            .map { it.value }
             .sortedByDescending { it.meta.downloaded }
             .chunked(pageSize)
         val mangaList = chunked[pageNum].map {
@@ -30,33 +37,26 @@ class MangaFolderService private constructor() {
         )
     }
 
-    fun getManga(id: String): MangaWithChapter? {
-        val mangaFolder = mangaFolders.find { it.id == id }
-        return if (mangaFolder != null) {
-            return MangaWithChapter(
-                manga = Manga.fromMangaFolder(mangaFolder),
-                chapter = mangaFolder.chapter
-            )
-        } else {
-            null
-        }
+    fun getManga(mangaId: String): MangaWithChapter {
+        val mangaFolder = mangaFolders[mangaId] ?: error("Manga ID $mangaId not found")
+        return MangaWithChapter(
+            manga = Manga.fromMangaFolder(mangaFolder),
+            chapter = mangaFolder.chapter
+        )
     }
 
     fun getImage(mangaId: String, imageFileName: String): File? {
-        return mangaFolders
-            .find { it.id == mangaId }
+        return mangaFolders[mangaId]
             ?.let { mangaFolder ->
                 val pair = mangaFolder.images.find { it.first.fileName.toString() == imageFileName }
                 pair?.let { pair.first.toFile() }
             }
     }
 
-    fun getPages(id: String): List<Page>? {
-        val mangaFolder = mangaFolders.find { it.id == id }
-        return if (mangaFolder != null) {
-            return mangaFolder.images.map { it.second }.toList()
-        } else {
-            null
-        }
+    fun getPages(mangaId: String): List<Page> {
+        val mangaFolder = mangaFolders[mangaId] ?: error("Manga ID $mangaId not found")
+        return mangaFolder.images.map { it.second }.toList()
     }
+
+    val containsKey = mangaFolders::containsKey
 }
