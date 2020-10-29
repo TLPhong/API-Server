@@ -9,12 +9,16 @@ data class MangaFolder(
     val id: String,
     val meta: GalleryInfo,
     val images: List<Pair<Path, Page>>
-){
+) {
     val thumbnail: Pair<Path, Page> = images.first()
-    var chapter: Chapter = createChapter()
+    val title: String = meta.title
+    val chapter: Chapter
 
+    init {
+        chapter = createChapter()
+    }
 
-    private fun createChapter():Chapter {
+    private fun createChapter(): Chapter {
         return Chapter(
             date_upload = parseTimeString(meta.uploadTime),
             name = meta.title,

@@ -16,7 +16,7 @@ data class Manga (
             val artist = mangaFolder.meta.getArtist()
             val description = mangaFolder.meta.description
             val thumbnailUrl = mangaFolder.thumbnail.second.imageUrl
-            val title = mangaFolder.meta.title
+            val title = mangaFolder.title
             val url = ApiPaths.mangaDetail(mangaFolder.id)
             return Manga(
                 artist,

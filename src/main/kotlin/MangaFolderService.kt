@@ -12,11 +12,50 @@ class MangaFolderService private constructor() {
 
     private val downloadDir = """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download"""
     private var mangaFolders: Map<String, MangaFolder>
+
     init {
-        mangaFolders =  DownloadFolderParser(Paths.get(downloadDir))
+        mangaFolders = DownloadFolderParser(Paths.get(downloadDir))
             .parse()
             .map { it.id to it }
             .toMap()
+    }
+
+    fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
+        val chunked = mangaFolders
+            .filter { entry -> entry.value.title.contains(query, ignoreCase = true) }
+            .map { it.value }
+            .chunked(pageSize)
+
+        val mangaList = chunked[pageNum - 1].map {
+            MangaWithChapter(
+                manga = Manga.fromMangaFolder(it),
+                chapter = it.chapter
+            )
+        }
+        val hasNext = chunked.size > pageNum + 1
+        return MangasPage(
+            mangas = mangaList,
+            hasNext
+        )
+    }
+
+
+    fun getMangasList(pageNum: Int, pageSize: Int = 20): MangasPage {
+        val chunked = mangaFolders
+            .map { it.value }
+            .chunked(pageSize)
+
+        val mangaList = chunked[pageNum - 1].map {
+            MangaWithChapter(
+                manga = Manga.fromMangaFolder(it),
+                chapter = it.chapter
+            )
+        }
+        val hasNext = chunked.size > pageNum + 1
+        return MangasPage(
+            mangas = mangaList,
+            hasNext
+        )
     }
 
     fun getLatestMangas(pageNum: Int, pageSize: Int = 20): MangasPage {
@@ -24,7 +63,7 @@ class MangaFolderService private constructor() {
             .map { it.value }
             .sortedByDescending { it.meta.downloaded }
             .chunked(pageSize)
-        val mangaList = chunked[pageNum].map {
+        val mangaList = chunked[pageNum - 1].map {
             MangaWithChapter(
                 manga = Manga.fromMangaFolder(it),
                 chapter = it.chapter

@@ -10,15 +10,6 @@ import io.ktor.util.*
 import mu.KLogger
 import mu.KotlinLogging
 
-open class ApiSubject(
-    val logger: KLogger
-)
-
-class MangaApiSubject(
-    logger: KLogger,
-    val mangaFolder: MangaFolderService
-) : ApiSubject(logger)
-
 fun Application.apiModule() {
     val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
@@ -29,7 +20,7 @@ fun Application.apiModule() {
         }
         route("api") {
             get("latest") {
-                val pageNum = (call.request.queryParameters["page"] ?: "0").toInt()
+                val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.getLatestMangas(pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
@@ -38,6 +29,27 @@ fun Application.apiModule() {
                 }
             }
 
+            get("popular") {
+                val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
+                val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
+                //TODO popular mangas
+                val mangas = mangaFolderService.getMangasList(pageNum, pageSize)
+                call.respondText(contentType = ContentType.Application.Json) {
+                    logger.info { "${call.request.uri} List popular for ${mangas.mangas.size} mangas" }
+                    klaxon.toJsonString(mangas)
+                }
+            }
+
+            get("search") {
+                val query = (call.request.queryParameters["query"] ?: "").toString()
+                val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
+                val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
+                val mangas = mangaFolderService.searchManga(query, pageNum, pageSize)
+                call.respondText(contentType = ContentType.Application.Json) {
+                    logger.info { "${call.request.uri} Search [] result, serve ${mangas.mangas.size} mangas" }
+                    klaxon.toJsonString(mangas)
+                }
+            }
 
             route("manga/{id}") {
                 val mangaIdKey = AttributeKey<String>("mangaId")
@@ -58,6 +70,7 @@ fun Application.apiModule() {
                     val file = mangaFolderService.getImage(mangaId, imageFileName)
                     if (file != null) {
                         logger.info { "${call.request.uri} served" }
+                        //TODO compress thumbnail
                         call.respondFile(file)
                     } else {
                         call.respond(HttpStatusCode.NotFound)

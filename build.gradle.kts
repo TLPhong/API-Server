@@ -3,13 +3,12 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     kotlin("jvm") version "1.4.10"
+    id("com.github.johnrengelman.shadow") version "5.0.0"
     application
 }
 
 group = "tlp.media.server.komga"
 version = "1.0-SNAPSHOT"
-
-application.mainClassName = "tlp.media.server.komga.ApplicationKt"
 
 repositories {
     mavenCentral()
@@ -35,6 +34,23 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
     testImplementation(files("""D:\Environment\Android\sdk-tools-windows-4333796\platforms\android-29\android.jar"""))
 }
+
+
+application {
+    mainClassName = "tlp.media.server.komga.ApplicationKt"
+}
+
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+}
+
+
+tasks.withType<Jar> {
+    manifest {
+        attributes(
+            mapOf(
+                "Main-Class" to "tlp.media.server.komga.ApplicationKt"
+            )
+        )
+    }
 }

@@ -43,7 +43,7 @@ class DownloadFolderParser(val rootFolder: Path) {
                     null
                 }
             }
-            .onEach { logger.info{"Complete parse ${it.meta.title}"} }
+            .onEach { logger.info{"Complete parse ${it.title}"} }
             .toList()
         logger.info { "Finished parse ${mangaFolderList.size} folder" }
         return mangaFolderList
