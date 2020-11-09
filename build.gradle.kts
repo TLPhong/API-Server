@@ -24,6 +24,7 @@ dependencies {
     implementation("com.beust:klaxon:5.0.1")
     implementation("io.github.microutils:kotlin-logging:1.12.0")
     implementation("ch.qos.logback:logback-classic:1.2.3")
+    implementation("org.imgscalr:imgscalr-lib:4.2")
     implementation("com.github.tachiyomiorg:extensions-lib:a596412")
 
     testImplementation("com.squareup.okhttp3:okhttp:3.10.0")

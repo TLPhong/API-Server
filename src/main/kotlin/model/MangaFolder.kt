@@ -1,6 +1,6 @@
 package tlp.media.server.komga.model
 
-import tlp.media.server.komga.ApiPaths
+import tlp.media.server.komga.constant.ApiPaths
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

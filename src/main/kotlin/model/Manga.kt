@@ -1,8 +1,7 @@
 package tlp.media.server.komga.model
 
 import eu.kanade.tachiyomi.source.model.SManga
-import tlp.media.server.komga.ApiPaths
-import tlp.media.server.komga.parser.Constant
+import tlp.media.server.komga.constant.ApiPaths
 
 data class Manga (
     override var artist: String?,
@@ -15,7 +14,7 @@ data class Manga (
         fun fromMangaFolder(mangaFolder: MangaFolder): Manga {
             val artist = mangaFolder.meta.getArtist()
             val description = mangaFolder.meta.description
-            val thumbnailUrl = mangaFolder.thumbnail.second.imageUrl
+            val thumbnailUrl = "${mangaFolder.thumbnail.second.imageUrl}?h=600&w=800"
             val title = mangaFolder.title
             val url = ApiPaths.mangaDetail(mangaFolder.id)
             return Manga(

@@ -1,4 +1,4 @@
-package tlp.media.server.komga
+package tlp.media.server.komga.service
 
 import tlp.media.server.komga.model.*
 import tlp.media.server.komga.parser.DownloadFolderParser

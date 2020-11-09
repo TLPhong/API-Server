@@ -4,7 +4,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertAll
 import tlp.media.server.komga.parser.FolderParser
 import tlp.media.server.komga.model.Manga
-import tlp.media.server.komga.parser.Constant
+import tlp.media.server.komga.constant.Constant
 import java.nio.file.Paths
 import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

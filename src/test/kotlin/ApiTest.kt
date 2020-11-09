@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import tlp.media.server.komga.MangaFolderService
+import tlp.media.server.komga.service.MangaFolderService
 import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage

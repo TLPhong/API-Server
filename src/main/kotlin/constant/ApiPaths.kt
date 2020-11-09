@@ -1,6 +1,4 @@
-package tlp.media.server.komga
-
-import tlp.media.server.komga.parser.Constant
+package tlp.media.server.komga.constant
 
 object ApiPaths {
     fun mangaDetail(mangaId: String) = "/${Constant.baseApiPath}/manga/${mangaId}"

@@ -7,12 +7,16 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
-import mu.KLogger
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
+import tlp.media.server.komga.service.ImageProcessingService
+import tlp.media.server.komga.service.MangaFolderService
+import java.nio.file.Files
 
 fun Application.apiModule() {
     val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
+    val imageService = ImageProcessingService.instance
     routing {
         var logger = KotlinLogging.logger("API Call")
         intercept(ApplicationCallPipeline.Setup) {
@@ -64,18 +68,6 @@ fun Application.apiModule() {
                     }
                 }
 
-                get("{image}") {
-                    val mangaId = call.attributes[mangaIdKey]
-                    val imageFileName = call.parameters["image"] ?: ""
-                    val file = mangaFolderService.getImage(mangaId, imageFileName)
-                    if (file != null) {
-                        logger.info { "${call.request.uri} served" }
-                        //TODO compress thumbnail
-                        call.respondFile(file)
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
-                    }
-                }
                 get("pages") {
                     val id = call.attributes[mangaIdKey]
                     val pages = mangaFolderService.getPages(id)
@@ -84,6 +76,32 @@ fun Application.apiModule() {
                         klaxon.toJsonString(pages)
                     }
                 }
+
+                get("{image}") {
+                    val mangaId = call.attributes[mangaIdKey]
+                    val imageFileName = call.parameters["image"] ?: ""
+                    val width = call.parameters["w"]
+                    val height = call.parameters["h"]
+                    val file = mangaFolderService.getImage(mangaId, imageFileName)
+                    if (file != null) {
+                        if (width != null && height != null) {
+                            call.respondBytes {
+                                imageService.resize(
+                                    file.toPath(),
+                                    width = Integer.valueOf(width),
+                                    height = Integer.valueOf(height)
+                                )
+                            }
+                            logger.info { "${call.request.uri} compressed and served" }
+                        } else {
+                            call.respondFile(file)
+                            logger.info { "${call.request.uri} served" }
+                        }
+                    } else {
+                        call.respond(HttpStatusCode.NotFound)
+                    }
+                }
+
                 /***
                  * Validate manga ID beforehand
                  */
