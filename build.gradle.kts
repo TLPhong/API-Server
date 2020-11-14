@@ -23,6 +23,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("com.beust:klaxon:5.0.1")
     implementation("io.github.microutils:kotlin-logging:1.12.0")
+    implementation("com.github.ben-manes.caffeine:caffeine:2.8.6")
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("org.imgscalr:imgscalr-lib:4.2")
     implementation("com.github.tachiyomiorg:extensions-lib:a596412")

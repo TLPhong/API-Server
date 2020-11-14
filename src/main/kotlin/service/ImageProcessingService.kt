@@ -13,7 +13,7 @@ class ImageProcessingService {
         val instance = ImageProcessingService()
     }
 
-    fun resize(path: Path, width: Int, height:Int): ByteArray {
+    fun resized(path: Path, width: Int, height:Int): ByteArray {
         val stream = path.toFile().inputStream()
         return Scalr.resize(
             ImageIO.read(stream),

@@ -1,7 +1,7 @@
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.DisplayName
 import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.constant.Constant

@@ -8,10 +8,10 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
-import kotlinx.coroutines.withContext
 import mu.KLogger
 import mu.KotlinLogging
 import tlp.media.server.komga.service.ImageProcessingService
+import tlp.media.server.komga.service.ImageReaderService
 import tlp.media.server.komga.service.MangaFolderService
 import java.nio.file.Files
 
@@ -21,7 +21,7 @@ val PipelineContext<Unit, ApplicationCall>.logger : KLogger
 fun Application.apiModule() {
     val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
-    val imageService = ImageProcessingService.instance
+    val imageReaderService = ImageReaderService.instance
     routing {
         route("api") {
             get("latest") {
@@ -85,19 +85,15 @@ fun Application.apiModule() {
                     val height = call.parameters["h"]
                     val file = mangaFolderService.getImage(mangaId, imageFileName)
                     if (file != null) {
-                        if (width != null && height != null) {
-                            call.respondBytes {
-                                imageService.resize(
-                                    file.toPath(),
-                                    width = Integer.valueOf(width),
-                                    height = Integer.valueOf(height)
-                                )
-                            }
-                            logger.info { "${file.name} Compressed and served" }
-                        } else {
-                            call.respondFile(file)
-                            logger.info { "${file.name} Served" }
+                        val path = file.toPath()
+                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
+                            imageReaderService.loadImage(
+                                path,
+                                if (width != null) Integer.valueOf(width) else null,
+                                if (height != null) Integer.valueOf(height) else null
+                            )
                         }
+                        logger.info { "Serve ${file.name}" }
                     } else {
                         call.respond(HttpStatusCode.NotFound)
                     }
