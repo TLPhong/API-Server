@@ -7,28 +7,29 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
+import io.ktor.util.pipeline.*
 import kotlinx.coroutines.withContext
+import mu.KLogger
 import mu.KotlinLogging
 import tlp.media.server.komga.service.ImageProcessingService
 import tlp.media.server.komga.service.MangaFolderService
 import java.nio.file.Files
+
+val PipelineContext<Unit, ApplicationCall>.logger : KLogger
+    get() = KotlinLogging.logger("Route ${this.call.request.uri}")
 
 fun Application.apiModule() {
     val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
     val imageService = ImageProcessingService.instance
     routing {
-        var logger = KotlinLogging.logger("API Call")
-        intercept(ApplicationCallPipeline.Setup) {
-            logger = KotlinLogging.logger("API ${call.request.uri}")
-        }
         route("api") {
             get("latest") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.getLatestMangas(pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
-                    logger.info { "${call.request.uri} List latest for ${mangas.mangas.size} mangas" }
+                    logger.info { "List latest for ${mangas.mangas.size} mangas" }
                     klaxon.toJsonString(mangas)
                 }
             }
@@ -37,9 +38,9 @@ fun Application.apiModule() {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 //TODO popular mangas
-                val mangas = mangaFolderService.getMangasList(pageNum, pageSize)
+                val mangas = mangaFolderService.getRandomMangaList(pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
-                    logger.info { "${call.request.uri} List popular for ${mangas.mangas.size} mangas" }
+                    logger.info { "List popular for ${mangas.mangas.size} mangas" }
                     klaxon.toJsonString(mangas)
                 }
             }
@@ -50,7 +51,7 @@ fun Application.apiModule() {
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.searchManga(query, pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
-                    logger.info { "${call.request.uri} Search [] result, serve ${mangas.mangas.size} mangas" }
+                    logger.info { "Search [] result, serve ${mangas.mangas.size} mangas" }
                     klaxon.toJsonString(mangas)
                 }
             }
@@ -63,7 +64,7 @@ fun Application.apiModule() {
                     val manga = mangaFolderService.getManga(mangaId)
 
                     call.respondText(contentType = ContentType.Application.Json) {
-                        logger.info { "${call.request.uri} Serve ${manga.manga.title}" }
+                        logger.info { "Serve ${manga.manga.title}" }
                         klaxon.toJsonString(manga)
                     }
                 }
@@ -72,7 +73,7 @@ fun Application.apiModule() {
                     val id = call.attributes[mangaIdKey]
                     val pages = mangaFolderService.getPages(id)
                     call.respondText(contentType = ContentType.Application.Json) {
-                        logger.info { "${call.request.uri} listing ${pages.size} pages" }
+                        logger.info { "Listing ${pages.size} pages" }
                         klaxon.toJsonString(pages)
                     }
                 }
@@ -92,10 +93,10 @@ fun Application.apiModule() {
                                     height = Integer.valueOf(height)
                                 )
                             }
-                            logger.info { "${call.request.uri} compressed and served" }
+                            logger.info { "${file.name} Compressed and served" }
                         } else {
                             call.respondFile(file)
-                            logger.info { "${call.request.uri} served" }
+                            logger.info { "${file.name} Served" }
                         }
                     } else {
                         call.respond(HttpStatusCode.NotFound)

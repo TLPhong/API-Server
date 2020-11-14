@@ -33,8 +33,9 @@ class ApiTest {
     @ParameterizedTest
     @ValueSource(ints = [1, 2, 10, 100])
     fun test_create_latest_request(input: Int) {
-        val expectedURL = "$baseURL/latest?page=$input&pageSize=20"
-        val request = requests.latestMangas(input)
+        val pageSize = 60
+        val expectedURL = "$baseURL/latest?page=$input&size=$pageSize"
+        val request = requests.latestMangas(input, pageSize)
         assertEquals(request.method(), "GET")
         assertEquals(request.url().toString(), expectedURL)
     }
@@ -43,7 +44,7 @@ class ApiTest {
     @DisplayName("Latest API call return OK")
     fun test_latest_api_call_ok() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/latest?page=0")) {
+            with(handleRequest(HttpMethod.Get, "api/latest?page=1")) {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
@@ -55,7 +56,7 @@ class ApiTest {
     @DisplayName("Latest API can parse")
     fun test_latest_api_call_can_parse() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/latest?page=0")) {
+            with(handleRequest(HttpMethod.Get, "api/latest?page=1")) {
                 val content = response.content!!
                 val mangasPage: MangasPage = parser.parseMangasPage(content)
                 assertFalse(mangasPage.mangas.isEmpty())
@@ -106,7 +107,7 @@ class ApiTest {
     @DisplayName("Client util test OK")
     fun test_latest_api_call_client_parser(input: Int) {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/latest?page=0&size=$input")) {
+            with(handleRequest(HttpMethod.Get, "api/latest?page=1&size=$input")) {
                 val content = response.content!!
                 val mangasPage: MangasPage = parser.parseMangasPage(content)
                 if (input == 9999) {

@@ -10,34 +10,22 @@ import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FolderParserTest {
 
-    val urlPrefix = "http://192.168.86.3:8081/api"
-
     @Test
     @DisplayName("Test folder parser")
     fun test_folder_parser_basic() {
         val pathString =
-            """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download\Fluffy Tail Series. Renamon incumming. [1760614]"""
-        val expectedDescription = """Hello everyone I´m Studio Natsume (AKA Natsumemetalsonic) and here you can see my 1º Hentai comic about Renamon and other digimons, thanks for the patronage of my subscribestarts on my Hentai Subscribestar:
+            """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download\(Kemoket 6) [Kemono Ekaki no Kousoku 2 (Sindoll)] Spell Magic [1069618]"""
+        val expectedDescription = """Scans by Super Shanko.
 
-ttps://subscribestar.adult/studio-natsume
-
-Fluffy Tail series is, or should be, a series with the theme of "furry", yes yes, I know that not everyone like it, but I will be drawing (In theory) more hentai no furry, here I will be doing parodies and original stories, but for now we can find this parody of Renamon.
-
-This chapter was drew 2 or 3 years ago to sell it in a manga event in Spain, but now I´m continue it in Subscribestar.
-
-You can find 6 more pages uploaded there, and I hope have more soon.
-
-Please enjoy it.
-
-P.D: There was another gallery, yes, but I could not upload it.
+Advertisement: Let me tell you something, brother! If you're in need of some nice or even big ass scans at a decent rate, then you come see Super Shanko, brother! He'll use that 600dpi resolution to ensure you've got nice looking work that'll be just as sweet 10 years from now, and you'd better believe it, brother!
 """
 
         val expected = Manga(
-            "natsumemetalsonic",
+            "sindoll",
             description = expectedDescription,
-            thumbnail_url = "${Constant.baseUrl}/manga/1760614/portada_internet.jpg",
-            title = "Fluffy Tail Series. Renamon incumming.",
-            url = "/${Constant.baseApiPath}/manga/1760614"
+            thumbnail_url = "${Constant.baseUrl}/manga/1069618/01_Scan_Cover.png?h=600&w=800",
+            title = "(Kemoket 6) [Kemono Ekaki no Kousoku 2 (Sindoll)]  Spell Magic",
+            url = "/${Constant.baseApiPath}/manga/1069618"
         )
 
         val path = Paths.get(pathString)
