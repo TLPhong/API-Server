@@ -2,6 +2,8 @@ package tlp.media.server.komga.parser
 
 import io.ktor.util.*
 import me.tongfei.progressbar.ProgressBar
+import me.tongfei.progressbar.ProgressBarBuilder
+import me.tongfei.progressbar.ProgressBarStyle
 import mu.KotlinLogging
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
@@ -22,7 +24,11 @@ class DownloadFolderParser(val rootFolder: Path) {
 
     fun parse(useProgressBar: Boolean = true, showLogLines: Boolean = false): List<MangaFolder> {
         val mangasFolderList = Files.list(rootFolder).toList()
-        val progressBar = ProgressBar("Parsing", mangasFolderList.size.toLong())
+        val progressBar = ProgressBarBuilder()
+            .setTaskName("Parse")
+            .setInitialMax(mangasFolderList.size.toLong())
+            .setStyle(ProgressBarStyle.ASCII)
+            .build()
         progressBar.extraMessage = "Reading..."
         //------------------------------------------
         if (showLogLines) logger.info { "Start indexing $rootFolder" }
