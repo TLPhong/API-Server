@@ -4,6 +4,7 @@ import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 
 class ImageReaderService private constructor() {
     companion object {
@@ -13,10 +14,8 @@ class ImageReaderService private constructor() {
     private val imageProcessingService by lazy { ImageProcessingService.instance }
 
     private val cache: Cache<String, ByteArray> = Caffeine.newBuilder()
-        .maximumWeight(500 * 1024 * 1024)
-        .weigher { _: String, byteArray: ByteArray ->
-            return@weigher byteArray.size
-        }
+        .maximumSize(150)
+        .expireAfterAccess(15, TimeUnit.MINUTES)
         .build()
 
     fun loadImage(path: Path, width: Int?, height: Int?): ByteArray {
