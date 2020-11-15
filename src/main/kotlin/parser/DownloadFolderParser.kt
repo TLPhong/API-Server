@@ -1,33 +1,38 @@
 package tlp.media.server.komga.parser
 
 import io.ktor.util.*
+import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.asSequence
+import kotlin.streams.toList
 
 class DownloadFolderParser(val rootFolder: Path) {
 
     private val logger = KotlinLogging.logger("Folder parser")
 
-    init{
+    init {
         if (!Files.isDirectory(rootFolder)) {
-            error("Path is not a folder: $rootFolder" )
+            error("Path is not a folder: $rootFolder")
         }
 
     }
 
-    fun parse(): List<MangaFolder> {
-        logger.info { "Start indexing $rootFolder" }
-        val mangaFolderList = Files.list(rootFolder)
-            .asSequence()
+    fun parse(useProgressBar: Boolean = true, showLogLines: Boolean = false): List<MangaFolder> {
+        val mangasFolderList = Files.list(rootFolder).toList()
+        val progressBar = ProgressBar("Parsing", mangasFolderList.size.toLong())
+        progressBar.extraMessage = "Reading..."
+        //------------------------------------------
+        if (showLogLines) logger.info { "Start indexing $rootFolder" }
+        val mangaFolderList = mangasFolderList
             .onEach {
-                logger.info { "Process ${it.fileName}" }
+                if (showLogLines) logger.info { "Process ${it.fileName}" }
             }
             .mapNotNull {
                 try {
-                    logger.info { "Validate folder ${it.fileName}" }
+                    if (showLogLines) logger.info { "Validate folder ${it.fileName}" }
                     FolderParser(it)
                 } catch (exception: Exception) {
                     logger.error(exception)
@@ -36,16 +41,20 @@ class DownloadFolderParser(val rootFolder: Path) {
             }
             .mapNotNull {
                 try {
-                    logger.info { "Parsing ${it.rootPath.fileName}" }
+                    if (showLogLines) logger.info { "Parsing ${it.rootPath.fileName}" }
                     it.parse()
                 } catch (exception: Exception) {
                     logger.error(exception)
                     null
                 }
             }
-            .onEach { logger.info{"Complete parse ${it.title}"} }
-            .toList()
-        logger.info { "Finished parse ${mangaFolderList.size} folder" }
+            .onEach {
+                if (showLogLines) logger.info { "Complete parse ${it.title}" }
+                if (useProgressBar) progressBar.step()
+            }
+        if (showLogLines) logger.info { "Finished parse ${mangaFolderList.size} folder" }
+        if (useProgressBar) progressBar.extraMessage = "Finished"
+        progressBar.close()
         return mangaFolderList
     }
 
