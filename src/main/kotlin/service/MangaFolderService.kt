@@ -45,7 +45,7 @@ class MangaFolderService private constructor() {
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
         return DownloadFolderParser(Paths.get(downloadDir))
-            .parse()
+            .parse(useProgressBar = false, showLogLines = true)
             .map { it.id to it }
             .toMap()
     }
@@ -118,13 +118,13 @@ class MangaFolderService private constructor() {
         }
     }
 
-    private fun scheduleRefreshRandom(){
+    private fun scheduleRefreshRandom() {
         val period = TimeUnit.HOURS.toMillis(1)
         Timer(true)
             .schedule(
                 period,
                 period
-            ){
+            ) {
                 seed = Random.nextLong()
             }
     }

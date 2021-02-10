@@ -22,14 +22,23 @@ class DownloadFolderParser(val rootFolder: Path) {
 
     }
 
-    fun parse(useProgressBar: Boolean = true, showLogLines: Boolean = false): List<MangaFolder> {
-        val mangasFolderList = Files.list(rootFolder).toList()
+    private fun createProgressBar(total: Number): ProgressBar {
         val progressBar = ProgressBarBuilder()
             .setTaskName("Parse")
-            .setInitialMax(mangasFolderList.size.toLong())
+            .setInitialMax(total.toLong())
             .setStyle(ProgressBarStyle.ASCII)
             .build()
         progressBar.extraMessage = "Reading..."
+        return progressBar
+    }
+
+    fun parse(useProgressBar: Boolean = true, showLogLines: Boolean = false): List<MangaFolder> {
+        val mangasFolderList = Files.list(rootFolder).toList()
+        val progressBar: ProgressBar? = if(useProgressBar){
+            createProgressBar(mangasFolderList.size)
+        }else{
+            null
+        }
         //------------------------------------------
         if (showLogLines) logger.info { "Start indexing $rootFolder" }
         val mangaFolderList = mangasFolderList
@@ -39,28 +48,33 @@ class DownloadFolderParser(val rootFolder: Path) {
             .mapNotNull {
                 try {
                     if (showLogLines) logger.info { "Validate folder ${it.fileName}" }
-                    FolderParser(it)
+                    return@mapNotNull FolderParser(it)
+                } catch (parserException: ParserException) {
+                    logger.warn("Validation error: ${parserException.message}")
                 } catch (exception: Exception) {
                     logger.error(exception)
-                    null
                 }
+                return@mapNotNull null
+
             }
             .mapNotNull {
                 try {
                     if (showLogLines) logger.info { "Parsing ${it.rootPath.fileName}" }
-                    it.parse()
+                    return@mapNotNull it.parse()
+                } catch (parserException: ParserException) {
+                    logger.warn ("Parsing error: ${parserException.message}")
                 } catch (exception: Exception) {
                     logger.error(exception)
-                    null
                 }
+                return@mapNotNull null
             }
             .onEach {
                 if (showLogLines) logger.info { "Complete parse ${it.title}" }
-                if (useProgressBar) progressBar.step()
+                progressBar?.step()
             }
         if (showLogLines) logger.info { "Finished parse ${mangaFolderList.size} folder" }
-        if (useProgressBar) progressBar.extraMessage = "Finished"
-        progressBar.close()
+        progressBar?.extraMessage = "Finished"
+        progressBar?.close()
         return mangaFolderList
     }
 

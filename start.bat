@@ -1,0 +1,1 @@
+java -jar -Xmx1G build/libs/KomgaAPI-1.0-SNAPSHOT-all.jar

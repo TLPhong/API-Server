@@ -20,6 +20,8 @@ class FolderParser(val rootPath: Path) {
         id = getId()
     }
 
+    private fun parserError(message: String): Nothing = throw ParserException(message)
+
     fun parse(): MangaFolder{
         val pages = imageList
             .sorted()
@@ -41,17 +43,17 @@ class FolderParser(val rootPath: Path) {
         return if (startIndex > 0 && endIndex > 0) {
             fileName.substring(startIndex + 1, endIndex)
         }else{
-            error("Dir name missing ID")
+            parserError("Dir name missing ID")
         }
     }
 
     private fun validateIsFolder() {
         if (!Files.exists(rootPath)) {
-            error("Path not exist $rootPath")
+            parserError("Path not exist $rootPath")
         }
 
         if (!Files.isDirectory(rootPath)) {
-            error("Path is not a directory $rootPath")
+            parserError("Path is not a directory $rootPath")
         }
     }
 
@@ -65,10 +67,10 @@ class FolderParser(val rootPath: Path) {
                 val extension = path.fileName.extension
                 if (extension == "png" || extension == "jpg") imageList.add(path)
             }
-        if (imageList.isEmpty()) error("Missing image file")
+        if (imageList.isEmpty()) parserError("Missing image file")
         else this.imageList = imageList.toList()
 
-        if (metaFile == null) error("Missing meta file")
+        if (metaFile == null) parserError("Missing meta file")
         else this.metaFile = metaFile as Path
     }
 }
