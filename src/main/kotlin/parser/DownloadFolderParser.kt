@@ -8,7 +8,6 @@ import mu.KotlinLogging
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.streams.asSequence
 import kotlin.streams.toList
 
 class DownloadFolderParser(val rootFolder: Path) {
@@ -32,7 +31,7 @@ class DownloadFolderParser(val rootFolder: Path) {
         return progressBar
     }
 
-    fun parse(useProgressBar: Boolean = true, showLogLines: Boolean = false): List<MangaFolder> {
+    fun parse(useProgressBar: Boolean = true, showDetailLog: Boolean = false): List<MangaFolder> {
         val mangasFolderList = Files.list(rootFolder).toList()
         val progressBar: ProgressBar? = if(useProgressBar){
             createProgressBar(mangasFolderList.size)
@@ -40,14 +39,14 @@ class DownloadFolderParser(val rootFolder: Path) {
             null
         }
         //------------------------------------------
-        if (showLogLines) logger.info { "Start indexing $rootFolder" }
+       logger.info { "Start parsing $rootFolder" }
         val mangaFolderList = mangasFolderList
             .onEach {
-                if (showLogLines) logger.info { "Process ${it.fileName}" }
+                if (showDetailLog) logger.info { "Process ${it.fileName}" }
             }
             .mapNotNull {
                 try {
-                    if (showLogLines) logger.info { "Validate folder ${it.fileName}" }
+                    if (showDetailLog) logger.info { "Validate folder ${it.fileName}" }
                     return@mapNotNull FolderParser(it)
                 } catch (parserException: ParserException) {
                     logger.warn("Validation error: ${parserException.message}")
@@ -59,7 +58,7 @@ class DownloadFolderParser(val rootFolder: Path) {
             }
             .mapNotNull {
                 try {
-                    if (showLogLines) logger.info { "Parsing ${it.rootPath.fileName}" }
+                    if (showDetailLog) logger.info { "Parsing ${it.rootPath.fileName}" }
                     return@mapNotNull it.parse()
                 } catch (parserException: ParserException) {
                     logger.warn ("Parsing error: ${parserException.message}")
@@ -69,10 +68,10 @@ class DownloadFolderParser(val rootFolder: Path) {
                 return@mapNotNull null
             }
             .onEach {
-                if (showLogLines) logger.info { "Complete parse ${it.title}" }
+                if (showDetailLog) logger.info { "Complete parse ${it.title}" }
                 progressBar?.step()
             }
-        if (showLogLines) logger.info { "Finished parse ${mangaFolderList.size} folder" }
+        logger.info { "Finished parsing ${mangaFolderList.size} folder" }
         progressBar?.extraMessage = "Finished"
         progressBar?.close()
         return mangaFolderList

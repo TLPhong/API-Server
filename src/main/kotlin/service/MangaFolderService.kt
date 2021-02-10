@@ -4,7 +4,6 @@ import tlp.media.server.komga.model.*
 import tlp.media.server.komga.parser.DownloadFolderParser
 import java.io.File
 import java.nio.file.Paths
-import java.util.*
 import kotlin.random.Random
 import java.util.Timer
 import java.util.concurrent.TimeUnit
@@ -45,7 +44,7 @@ class MangaFolderService private constructor() {
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
         return DownloadFolderParser(Paths.get(downloadDir))
-            .parse(useProgressBar = false, showLogLines = true)
+            .parse(useProgressBar = false, showDetailLog = false)
             .map { it.id to it }
             .toMap()
     }
