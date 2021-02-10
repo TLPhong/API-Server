@@ -23,7 +23,7 @@ Advertisement: Let me tell you something, brother! If you're in need of some nic
         val expected = Manga(
             "sindoll",
             description = expectedDescription,
-            thumbnail_url = "${Constant.baseUrl}/manga/1069618/01_Scan_Cover.png?h=600&w=800",
+            thumbnail_url = "${Constant.baseUrl}/manga/1069618/01_Scan_Cover.png/thumbnail",
             title = "(Kemoket 6) [Kemono Ekaki no Kousoku 2 (Sindoll)]  Spell Magic",
             url = "/${Constant.baseApiPath}/manga/1069618"
         )

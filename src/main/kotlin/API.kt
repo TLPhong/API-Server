@@ -10,12 +10,13 @@ import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import mu.KLogger
 import mu.KotlinLogging
-import tlp.media.server.komga.service.ImageProcessingService
 import tlp.media.server.komga.service.ImageReaderService
 import tlp.media.server.komga.service.MangaFolderService
+import java.io.File
 import java.nio.file.Files
+import java.nio.file.Path
 
-val PipelineContext<Unit, ApplicationCall>.logger : KLogger
+val PipelineContext<Unit, ApplicationCall>.logger: KLogger
     get() = KotlinLogging.logger("Route ${this.call.request.uri}")
 
 fun Application.apiModule() {
@@ -78,24 +79,34 @@ fun Application.apiModule() {
                     }
                 }
 
-                get("{image}") {
-                    val mangaId = call.attributes[mangaIdKey]
-                    val imageFileName = call.parameters["image"] ?: ""
-                    val width = call.parameters["w"]
-                    val height = call.parameters["h"]
-                    val file = mangaFolderService.getImage(mangaId, imageFileName)
-                    if (file != null) {
-                        val path = file.toPath()
-                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
-                            imageReaderService.loadImage(
-                                path,
-                                if (width != null) Integer.valueOf(width) else null,
-                                if (height != null) Integer.valueOf(height) else null
-                            )
+                route("{image}") {
+                    val imagePathKey = AttributeKey<Path>("imagePath")
+                    intercept(ApplicationCallPipeline.Features) {
+                        val mangaId = call.attributes[mangaIdKey]
+                        val imageFileName = call.parameters["image"] ?: ""
+                        val file = mangaFolderService.getImage(mangaId, imageFileName)
+                        if (file != null) {
+                            call.attributes.put(imagePathKey, file.toPath())
+                        } else {
+                            logger.warn { "Image file not found [$mangaId/$imageFileName] not found" }
+                            call.respond(HttpStatusCode.NotFound)
+                            finish()
                         }
-                        logger.info { "Serve ${file.name}" }
-                    } else {
-                        call.respond(HttpStatusCode.NotFound)
+                    }
+                    get {
+                        val path = call.attributes.get(key = imagePathKey)
+                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
+                            imageReaderService.loadImage(path, resized = false)
+                        }
+                        logger.info { "Serve ${path.fileName}" }
+                    }
+                    get("thumbnail") {
+                        val path = call.attributes.get(key = imagePathKey)
+                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
+                            imageReaderService.loadImage(path, resized = true)
+                        }
+                        logger.info { "Serve ${path.fileName} compressed" }
+
                     }
                 }
 

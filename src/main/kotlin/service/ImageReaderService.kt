@@ -14,17 +14,17 @@ class ImageReaderService private constructor() {
     private val imageProcessingService by lazy { ImageProcessingService.instance }
 
     private val cache: Cache<String, ByteArray> = Caffeine.newBuilder()
-        .maximumSize(150)
+        .maximumSize(100)
         .expireAfterAccess(15, TimeUnit.MINUTES)
         .build()
 
-    fun loadImage(path: Path, width: Int?, height: Int?): ByteArray {
-        val cacheKey = "${path.toAbsolutePath()}|[w-${width ?: -1}]|[h-${height ?: -1}]"
+    fun loadImage(path: Path, resized: Boolean): ByteArray {
+        val cacheKey = "${path.toAbsolutePath()}" + if (resized) "|resized" else ""
         return cache.get(cacheKey) {
-            if (width == null || height == null) {
+            if (!resized) {
                 loadImage(path)
             } else {
-                loadCompressed(path, width, height)
+                loadCompressed(path)
             }
         }!!
     }
@@ -33,7 +33,7 @@ class ImageReaderService private constructor() {
         return Files.newInputStream(path).readBytes()
     }
 
-    private fun loadCompressed(path: Path, width: Int, height: Int): ByteArray {
-        return imageProcessingService.resized(path, width, height)
+    private fun loadCompressed(path: Path): ByteArray {
+        return imageProcessingService.resized(path, 600, 800)
     }
 }

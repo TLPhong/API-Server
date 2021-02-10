@@ -17,14 +17,11 @@ class MangaFolderService private constructor() {
 
     private val downloadDir = """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download"""
     private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
+    private var seed = Random.nextLong()
 
     init {
         scheduleRefreshMangaFolder()
-    }
-
-    private val seed by lazy {
-        val currTime = Calendar.getInstance().timeInMillis
-        currTime / (1000 * 3600)
+        scheduleRefreshRandom()
     }
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
@@ -52,6 +49,7 @@ class MangaFolderService private constructor() {
             .map { it.id to it }
             .toMap()
     }
+
 
     fun getRandomMangaList(pageNum: Int, pageSize: Int = 20): MangasPage {
         val mangas = mangaFolders
@@ -110,11 +108,24 @@ class MangaFolderService private constructor() {
     }
 
     private fun scheduleRefreshMangaFolder() {
+        val period = TimeUnit.SECONDS.toMillis(90)
+
         Timer(true).schedule(
-            TimeUnit.SECONDS.toMillis(20),
-            TimeUnit.SECONDS.toMillis(20)
+            period,
+            period
         ) {
             mangaFolders = parseMangasFolder()
         }
+    }
+
+    private fun scheduleRefreshRandom(){
+        val period = TimeUnit.HOURS.toMillis(1)
+        Timer(true)
+            .schedule(
+                period,
+                period
+            ){
+                seed = Random.nextLong()
+            }
     }
 }

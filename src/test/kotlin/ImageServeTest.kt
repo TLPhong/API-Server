@@ -50,7 +50,7 @@ class ImageServeTest {
             }
         }
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "${Constant.baseApiPath}/$testImage?h=800&w=600")) {
+            with(handleRequest(HttpMethod.Get, "${Constant.baseApiPath}/$testImage/thumbnail")) {
                 val content = this.response.byteContent!!
                  assertTrue {
                      originImageSize > content.size
