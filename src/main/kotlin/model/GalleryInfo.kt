@@ -8,14 +8,18 @@ data class GalleryInfo(
     val tags: List<Tag>,
     val description: String
 ) {
-    fun getArtist():String {
+    fun getArtist(): String {
         val artists = tags
             .filter { tag -> tag.group == "artist" }
             .map { it.name }
-        return if (artists.isNotEmpty()){
+        return if (artists.isNotEmpty()) {
             artists.first()
-        }else{
+        } else {
             ""
         }
+    }
+
+    fun getTagString(): String {
+        return tags.map { it.toString() }.joinToString ( ", " )
     }
 }

@@ -17,13 +17,17 @@ data class Manga (
             val thumbnailUrl = "${mangaFolder.thumbnail.second.imageUrl}/thumbnail"
             val title = mangaFolder.title
             val url = ApiPaths.mangaDetail(mangaFolder.id)
-            return Manga(
+            val manga =  Manga(
                 artist,
                 description,
                 thumbnailUrl,
                 title,
                 url
             )
+            val tagsString = mangaFolder.meta.getTagString()
+            manga.genre = tagsString
+
+            return manga
         }
     }
 
