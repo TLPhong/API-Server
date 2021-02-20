@@ -24,9 +24,7 @@ class MangaFolderService private constructor() {
     }
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
-        val chunked = mangaFolders
-            .filter { entry -> entry.value.title.contains(query, ignoreCase = true) }
-            .map { it.value }
+        val chunked = filteredMangaFolders(query)
             .chunked(pageSize)
 
         var mangaList: List<MangaWithChapter>? = null
@@ -45,6 +43,21 @@ class MangaFolderService private constructor() {
             mangas = mangaList ?: emptyList(),
             hasNext
         )
+    }
+
+    private fun filteredMangaFolders(query: String): List<MangaFolder> {
+        return mangaFolders
+            .filter { entry ->
+                val mangaFolder = entry.value
+                var matched = mangaFolder.title.contains(query, ignoreCase = true)
+
+                if (!matched) {
+                    matched = mangaFolder.meta.tags.any { tag -> tag.toString().equals(query, ignoreCase = true) }
+                }
+
+                return@filter matched
+            }
+            .map { it.value }
     }
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
@@ -93,7 +106,7 @@ class MangaFolderService private constructor() {
         return mangaFolder.images.map { it.second }.toList()
     }
 
-    fun containsKey(key:String): Boolean {
+    fun containsKey(key: String): Boolean {
         return mangaFolders.containsKey(key)
     }
 
