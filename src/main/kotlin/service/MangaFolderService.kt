@@ -52,7 +52,7 @@ class MangaFolderService private constructor() {
                 var matched = mangaFolder.title.contains(query, ignoreCase = true)
 
                 if (!matched) {
-                    matched = mangaFolder.meta.tags.any { tag -> tag.toString().equals(query, ignoreCase = true) }
+                    matched = mangaFolder.meta.tags.any { tag -> tag.toString().contains(query, ignoreCase = true) }
                 }
 
                 return@filter matched
