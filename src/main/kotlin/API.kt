@@ -56,7 +56,7 @@ fun Application.apiModule() {
                     klaxon.toJsonString(mangas)
                 }
             }
-
+            // MangaDetail
             route("manga/{id}") {
                 val mangaIdKey = AttributeKey<String>("mangaId")
 

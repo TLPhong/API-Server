@@ -42,7 +42,7 @@ class MangaFolderService private constructor() {
         }
 
         return MangasPage(
-            mangas = mangaList?: emptyList(),
+            mangas = mangaList ?: emptyList(),
             hasNext
         )
     }
@@ -93,22 +93,32 @@ class MangaFolderService private constructor() {
         return mangaFolder.images.map { it.second }.toList()
     }
 
-    val containsKey = mangaFolders::containsKey
+    fun containsKey(key:String): Boolean {
+        return mangaFolders.containsKey(key)
+    }
 
     private fun getPagedMangasPage(mangas: List<MangaFolder>, pageNum: Int, pageSize: Int): MangasPage {
         val chunked = mangas.chunked(pageSize)
-        val chunkIndex = pageNum - 1
-        val mangaList = chunked[chunkIndex].map {
-            MangaWithChapter(
-                manga = Manga.fromMangaFolder(it),
-                chapter = it.chapter
+
+        return if (chunked.isNotEmpty()) {
+            val chunkIndex = pageNum - 1
+            val mangaList = chunked[chunkIndex].map {
+                MangaWithChapter(
+                    manga = Manga.fromMangaFolder(it),
+                    chapter = it.chapter
+                )
+            }
+            val hasNext = chunked.size > pageNum + 1
+            MangasPage(
+                mangas = mangaList,
+                hasNext
+            )
+        } else {
+            MangasPage(
+                mangas = emptyList(),
+                hasNextPage = false
             )
         }
-        val hasNext = chunked.size > pageNum + 1
-        return MangasPage(
-            mangas = mangaList,
-            hasNext
-        )
     }
 
     private fun scheduleRefreshMangaFolder() {
