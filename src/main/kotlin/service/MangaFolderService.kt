@@ -27,20 +27,23 @@ class MangaFolderService private constructor() {
         val chunked = filteredMangaFolders(query)
             .chunked(pageSize)
 
-        var mangaList: List<MangaWithChapter>? = null
-        var hasNext = false
-        if (chunked.isNotEmpty()) {
-            mangaList = chunked[pageNum - 1].map {
-                MangaWithChapter(
-                    manga = Manga.fromMangaFolder(it),
-                    chapter = it.chapter
-                )
-            }
-            hasNext = chunked.size > pageNum + 1
+        if (chunked.isNullOrEmpty()) {
+            return MangasPage(
+                mangas = emptyList(),
+                hasNextPage = true
+            )
         }
 
+        val mangaList = chunked[pageNum - 1].map {
+            MangaWithChapter(
+                manga = Manga.fromMangaFolder(it),
+                chapter = it.chapter
+            )
+        }
+        val hasNext: Boolean = chunked.size > pageNum + 1
+
         return MangasPage(
-            mangas = mangaList ?: emptyList(),
+            mangas = mangaList,
             hasNext
         )
     }
