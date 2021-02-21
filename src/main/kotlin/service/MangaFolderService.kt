@@ -60,7 +60,7 @@ class MangaFolderService private constructor() {
                         matchScore += 1
                     }
 
-                    matchScore+= mangaFolder.meta.tags.count { tag ->
+                    matchScore += mangaFolder.meta.tags.count { tag ->
                         tag.toString().equals(query, ignoreCase = true) ||
                                 tag.name.equals(query, ignoreCase = true)
                     }
@@ -69,7 +69,7 @@ class MangaFolderService private constructor() {
                 }
                Pair(entry, matchScore)
             }
-            .filter { (_, matchScore) -> matchScore < 1 }
+            .filter { (_, matchScore) -> matchScore > 0 }
             .sortedByDescending { (_, matchScore) -> matchScore }
             .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
     }
