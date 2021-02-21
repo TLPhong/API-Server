@@ -44,7 +44,10 @@ application {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    val java8 = JavaVersion.VERSION_1_8.toString()
+    sourceCompatibility = java8
+    targetCompatibility = java8
+    kotlinOptions.jvmTarget = java8
 }
 
 
