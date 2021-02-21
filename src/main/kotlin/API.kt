@@ -52,7 +52,7 @@ fun Application.apiModule() {
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.searchManga(query, pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
-                    logger.info { "Search [] result, serve ${mangas.mangas.size} mangas" }
+                    logger.info { "Query [$query] result, serve ${mangas.mangas.size} mangas" }
                     klaxon.toJsonString(mangas)
                 }
             }
