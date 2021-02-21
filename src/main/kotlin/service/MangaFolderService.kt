@@ -51,22 +51,27 @@ class MangaFolderService private constructor() {
 
     private fun queryMangaFolders(queries: List<String>): List<MangaFolder> {
         return mangaFolders
-            .filter { entry ->
+            .map { entry ->
                 val mangaFolder = entry.value
-                return@filter queries.any { query ->
-                    var matched = mangaFolder.title.contains(query, ignoreCase = true)
+                val matchScore = queries.sumOf { query ->
+                    var matchScore = 0
 
-                    if (!matched) {
-                        matched = mangaFolder.meta.tags.any { tag ->
-                            tag.toString().equals(query, ignoreCase = true) ||
-                                    tag.name.equals(query, ignoreCase = true)
-
-                        }
+                    if (mangaFolder.title.contains(query, ignoreCase = true)) {
+                        matchScore += 1
                     }
-                    return@any matched
+
+                    matchScore+= mangaFolder.meta.tags.count { tag ->
+                        tag.toString().equals(query, ignoreCase = true) ||
+                                tag.name.equals(query, ignoreCase = true)
+                    }
+
+                    matchScore
                 }
+               Pair(entry, matchScore)
             }
-            .map { it.value }
+            .filter { (_, matchScore) -> matchScore < 1 }
+            .sortedByDescending { (_, matchScore) -> matchScore }
+            .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
     }
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
