@@ -25,7 +25,7 @@ class MangaFolderService private constructor() {
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
         val queries = query.split(" ")
-        val chunked = filteredMangaFolders(queries)
+        val chunked = queryMangaFolders(queries)
             .chunked(pageSize)
 
         if (chunked.isNullOrEmpty()) {
@@ -49,7 +49,7 @@ class MangaFolderService private constructor() {
         )
     }
 
-    private fun filteredMangaFolders(queries: List<String>): List<MangaFolder> {
+    private fun queryMangaFolders(queries: List<String>): List<MangaFolder> {
         return mangaFolders
             .filter { entry ->
                 val mangaFolder = entry.value
