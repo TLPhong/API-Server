@@ -24,8 +24,7 @@ class MangaFolderService private constructor() {
     }
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
-        val queries = query.split(" ")
-        val chunked = queryMangaFolders(queries)
+        val chunked = queryMangaFolders(query)
             .chunked(pageSize)
 
         if (chunked.isNullOrEmpty()) {
@@ -49,25 +48,33 @@ class MangaFolderService private constructor() {
         )
     }
 
-    private fun queryMangaFolders(queries: List<String>): List<MangaFolder> {
+    private fun queryMangaFolders(query: String): List<MangaFolder> {
         return mangaFolders
             .map { entry ->
                 val mangaFolder = entry.value
-                val matchScore = queries.sumOf { query ->
+                val tags = mangaFolder.meta.tags.map { it.toString() }
+                val queries = query.split(" ")
+                var totalMatchScore = 0
+
+                if (mangaFolder.title.contains(query, ignoreCase = true)) {
+                    totalMatchScore += 1
+                }
+
+                totalMatchScore += tags.sumOf { tag ->
                     var matchScore = 0
 
-                    if (mangaFolder.title.contains(query, ignoreCase = true)) {
-                        matchScore += 1
+                    if (tag.equals(query, ignoreCase = true)) {
+                        matchScore++
                     }
 
-                    matchScore += mangaFolder.meta.tags.count { tag ->
-                        tag.toString().equals(query, ignoreCase = true) ||
-                                tag.name.equals(query, ignoreCase = true)
+                    matchScore += queries.count { query ->
+                        tag.contains(query, ignoreCase = true)
                     }
 
                     matchScore
                 }
-               Pair(entry, matchScore)
+
+                Pair(entry, totalMatchScore)
             }
             .filter { (_, matchScore) -> matchScore > 0 }
             .sortedByDescending { (_, matchScore) -> matchScore }

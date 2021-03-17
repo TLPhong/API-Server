@@ -27,6 +27,7 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:1.2.3")
     implementation("org.imgscalr:imgscalr-lib:4.2")
     implementation("me.tongfei:progressbar:0.9.0")
+    implementation("io.requery:requery:1.6.1")
     implementation("com.github.tachiyomiorg:extensions-lib:a596412")
 
     testImplementation("com.squareup.okhttp3:okhttp:3.10.0")
