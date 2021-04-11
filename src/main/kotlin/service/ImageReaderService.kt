@@ -30,7 +30,7 @@ class ImageReaderService private constructor() {
     }
 
     private fun loadImage(path: Path): ByteArray {
-        return Files.newInputStream(path).readBytes()
+        return Files.newInputStream(path).use { it.readBytes() }
     }
 
     private fun loadCompressed(path: Path): ByteArray {
