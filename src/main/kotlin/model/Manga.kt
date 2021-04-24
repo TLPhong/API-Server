@@ -1,8 +1,10 @@
 package tlp.media.server.komga.model
 
 import eu.kanade.tachiyomi.source.model.SManga
+import kotlinx.serialization.Serializable
 import tlp.media.server.komga.constant.ApiPaths
 
+@Serializable
 data class Manga (
     override var artist: String?,
     override var description: String?,

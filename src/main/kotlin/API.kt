@@ -1,6 +1,5 @@
 package tlp.media.server.komga
 
-import com.beust.klaxon.Klaxon
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.request.*
@@ -12,15 +11,16 @@ import mu.KLogger
 import mu.KotlinLogging
 import tlp.media.server.komga.service.ImageReaderService
 import tlp.media.server.komga.service.MangaFolderService
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 val PipelineContext<Unit, ApplicationCall>.logger: KLogger
     get() = KotlinLogging.logger("Route ${this.call.request.uri}")
 
 fun Application.apiModule() {
-    val klaxon = Klaxon()
+//    val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
     val imageReaderService = ImageReaderService.instance
     routing {
@@ -31,7 +31,7 @@ fun Application.apiModule() {
                 val mangas = mangaFolderService.getLatestMangas(pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
                     logger.info { "List latest for ${mangas.mangas.size} mangas" }
-                    klaxon.toJsonString(mangas)
+                    Json.encodeToString(mangas)
                 }
             }
 
@@ -42,7 +42,7 @@ fun Application.apiModule() {
                 val mangas = mangaFolderService.getRandomMangaList(pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
                     logger.info { "List popular for ${mangas.mangas.size} mangas" }
-                    klaxon.toJsonString(mangas)
+                    Json.encodeToString(mangas)
                 }
             }
 
@@ -53,7 +53,7 @@ fun Application.apiModule() {
                 val mangas = mangaFolderService.searchManga(query, pageNum, pageSize)
                 call.respondText(contentType = ContentType.Application.Json) {
                     logger.info { "Query [$query] result, serve ${mangas.mangas.size} mangas" }
-                    klaxon.toJsonString(mangas)
+                    Json.encodeToString(mangas)
                 }
             }
             // MangaDetail
@@ -66,7 +66,7 @@ fun Application.apiModule() {
 
                     call.respondText(contentType = ContentType.Application.Json) {
                         logger.info { "Serve ${manga.manga.title}" }
-                        klaxon.toJsonString(manga)
+                        Json.encodeToString(manga)
                     }
                 }
 
@@ -75,7 +75,7 @@ fun Application.apiModule() {
                     val pages = mangaFolderService.getPages(id)
                     call.respondText(contentType = ContentType.Application.Json) {
                         logger.info { "Listing ${pages.size} pages" }
-                        klaxon.toJsonString(pages)
+                        Json.encodeToString(pages)
                     }
                 }
 

@@ -3,7 +3,7 @@ package client
 import okhttp3.Request
 import okhttp3.HttpUrl
 
-class TlpRequests() {
+class TlpRequests {
     val host = "192.168.86.3"
     val port = 8081
 

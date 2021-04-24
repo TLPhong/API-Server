@@ -2,7 +2,6 @@ package tlp.media.server.komga.service
 
 import io.ktor.util.*
 import org.imgscalr.Scalr
-import java.awt.image.BufferedImageOp
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import javax.imageio.ImageIO
