@@ -1,7 +1,7 @@
 package tlp.media.server.komga.service
 
 import tlp.media.server.komga.model.*
-import tlp.media.server.komga.parser.DownloadFolderParser
+import tlp.media.server.komga.parser.MangaFolderParser
 import java.io.File
 import java.nio.file.Paths
 import kotlin.random.Random
@@ -82,7 +82,7 @@ class MangaFolderService private constructor() {
     }
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
-        return DownloadFolderParser(Paths.get(downloadDir))
+        return MangaFolderParser(Paths.get(downloadDir))
             .parse(useProgressBar = false, showDetailLog = false)
             .map { it.id to it }
             .toMap()

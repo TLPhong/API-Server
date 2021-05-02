@@ -8,9 +8,10 @@ import mu.KotlinLogging
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.math.log
 import kotlin.streams.toList
 
-class DownloadFolderParser(val rootFolder: Path) {
+class MangaFolderParser(val rootFolder: Path) {
 
     private val logger = KotlinLogging.logger("Folder parser")
 
@@ -33,35 +34,27 @@ class DownloadFolderParser(val rootFolder: Path) {
 
     fun parse(useProgressBar: Boolean = true, showDetailLog: Boolean = false): List<MangaFolder> {
         val mangasFolderList = Files.list(rootFolder).toList()
-        val progressBar: ProgressBar? = if(useProgressBar){
+        val progressBar: ProgressBar? = if (useProgressBar) {
             createProgressBar(mangasFolderList.size)
-        }else{
+        } else {
             null
         }
         //------------------------------------------
-       logger.info { "Start parsing $rootFolder" }
+        logger.info { "Start parsing $rootFolder" }
         val mangaFolderList = mangasFolderList
             .onEach {
                 if (showDetailLog) logger.info { "Process ${it.fileName}" }
             }
+            .filterNotNull()
             .mapNotNull {
                 try {
                     if (showDetailLog) logger.info { "Validate folder ${it.fileName}" }
-                    return@mapNotNull FolderParser(it)
-                } catch (parserException: ParserException) {
-                    logger.warn("Validation error: ${parserException.message}")
-                } catch (exception: Exception) {
-                    logger.error(exception)
-                }
-                return@mapNotNull null
+                    val folderParser = FolderParser(it)
+                    if (showDetailLog) logger.info { "Parsing ${it.fileName}" }
 
-            }
-            .mapNotNull {
-                try {
-                    if (showDetailLog) logger.info { "Parsing ${it.rootPath.fileName}" }
-                    return@mapNotNull it.parse()
+                    return@mapNotNull folderParser.parse()
                 } catch (parserException: ParserException) {
-                    logger.warn ("Parsing error: ${parserException.message}")
+                    logger.warn("Parsing error: ${parserException.message}")
                 } catch (exception: Exception) {
                     logger.error(exception)
                 }
