@@ -17,6 +17,9 @@ repositories {
     maven("https://jitpack.io")
 }
 
+val libDir = projectDir.absolutePath + File.separator +  "lib"
+println("Local library: $libDir" )
+
 val ktorVersion = "1.4.0"
 dependencies {
     implementation(kotlin("stdlib"))
@@ -36,7 +39,7 @@ dependencies {
     testImplementation("com.github.salomonbrys.kotson:kotson:2.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.6.2")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
-    testImplementation(files("""D:\Environment\Android\sdk-tools-windows-4333796\platforms\android-29\android.jar"""))
+    testImplementation(files("${libDir}${File.separator}android.jar"))
 }
 
 
