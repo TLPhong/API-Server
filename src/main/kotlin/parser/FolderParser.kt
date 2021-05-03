@@ -62,7 +62,7 @@ class FolderParser(val rootPath: Path) {
         val isIntegerFileName = this.imageList
             .map { imagePath ->
                 val fileName = imagePath.fileName.toString()
-                fileName.substring(fileName.lastIndexOf("."))
+                fileName.substring(0, fileName.lastIndexOf("."))
             }
             .all { fileNameNoExt ->
                 fileNameNoExt.toIntOrNull() != null
@@ -72,7 +72,7 @@ class FolderParser(val rootPath: Path) {
             this.imageList
                 .sortBy { imagePath ->
                     val fileName = imagePath.fileName.toString()
-                    val fileNoExt = fileName.substring(fileName.lastIndexOf("."))
+                    val fileNoExt = fileName.substring(0, fileName.lastIndexOf("."))
                     fileNoExt.toInt()
                 }
         }else{
