@@ -24,6 +24,7 @@ fun Application.apiModule() {
     val mangaFolderService = MangaFolderService.instance
     val imageReaderService = ImageReaderService.instance
     routing {
+
         route("api") {
             get("latest") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
