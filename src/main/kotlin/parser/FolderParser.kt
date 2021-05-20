@@ -10,7 +10,7 @@ import java.nio.file.Path
 class FolderParser(val rootPath: Path) {
 
     private lateinit var metaFile: Path
-    private lateinit var imageList: MutableList<Path>
+    private lateinit var imageList: List<Path>
     private var id: String
     private val baseUrl = Constant.baseUrl
     private val metaFileName = "galleryinfo.txt"
@@ -59,26 +59,27 @@ class FolderParser(val rootPath: Path) {
     }
 
     private fun sortImageList() {
-        val isIntegerFileName = this.imageList
-            .map { imagePath ->
-                val fileName = imagePath.fileName.toString()
-                fileName.substring(0, fileName.lastIndexOf("."))
-            }
-            .all { fileNameNoExt ->
-                fileNameNoExt.toIntOrNull() != null
-            }
+        val stringImageList = mutableListOf<Path>()
+        val integerImageList = mutableListOf<Path>()
 
-        if (isIntegerFileName) {
-            this.imageList
-                .sortBy { imagePath ->
-                    val fileName = imagePath.fileName.toString()
-                    val fileNoExt = fileName.substring(0, fileName.lastIndexOf("."))
-                    fileNoExt.toInt()
-                }
-        }else{
-            this.imageList.sort()
+        this.imageList.forEach { imagePath ->
+            val fileName = imagePath.fileName.toString()
+            val fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."))
+            if (fileNameNoExt.toIntOrNull() != null) {
+                integerImageList.add(imagePath)
+            } else {
+                stringImageList.add(imagePath)
+            }
         }
 
+        stringImageList.sort()
+        integerImageList.sortBy { imagePath ->
+            val fileName = imagePath.fileName.toString()
+            val fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."))
+            fileNameNoExt.toInt()
+        }
+
+        this.imageList = stringImageList + integerImageList
     }
 
     private fun validateContent() {
