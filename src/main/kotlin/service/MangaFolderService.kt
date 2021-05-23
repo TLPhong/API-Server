@@ -1,5 +1,6 @@
 package tlp.media.server.komga.service
 
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.*
 import tlp.media.server.komga.parser.MangaFolderParser
 import java.io.File
@@ -13,8 +14,7 @@ class MangaFolderService private constructor() {
     companion object {
         val instance = MangaFolderService()
     }
-
-    private val downloadDir = """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download"""
+    private val downloadDir = Constant.galleryPath
     private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
     private var seed = Random.nextLong()
 
