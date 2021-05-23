@@ -31,7 +31,8 @@ class ApiTest {
     fun setup() {
         testResources = TestResources(
             workingDir, listOf(
-                ZipFileEntry("test_manga.zip", "123tlp")
+                ZipFileEntry("test_manga_1.zip", "123tlp"),
+                ZipFileEntry("test_manga_2.zip", "123tlp")
             )
         )
         MangaFolderService.instance
