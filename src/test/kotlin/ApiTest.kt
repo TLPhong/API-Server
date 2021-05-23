@@ -3,15 +3,15 @@ import client.TlpResponseUtil
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import tlp.media.server.komga.service.MangaFolderService
 import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage
+import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -23,9 +23,23 @@ class ApiTest {
     private val baseURL = "http://192.168.86.3:8081/api"
     private val requests = TlpRequests()
     private val parser = TlpResponseUtil()
+    private val workingDir: Path = Paths.get("test_gallery")
+    private var testResources: TestResources? = null
 
-    init {
+
+    @BeforeAll
+    fun setup() {
+        testResources = TestResources(
+            workingDir, listOf(
+                ZipFileEntry("test_manga.zip", "123tlp")
+            )
+        )
         MangaFolderService.instance
+    }
+
+    @AfterAll
+    fun tearDown() {
+        testResources?.deleteGalleryDir()
     }
 
 
