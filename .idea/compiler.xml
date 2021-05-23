@@ -7,9 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ApiServer" />
+        <module name="Api-Server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="Api-Server" target="1.5" />
       <module name="ApiServer" target="1.5" />
       <module name="ApiServer (1)" target="1.5" />
       <module name="ApiServer (2)" target="1.5" />
