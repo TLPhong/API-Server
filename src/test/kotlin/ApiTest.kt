@@ -8,6 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import tlp.media.server.komga.service.MangaFolderService
 import tlp.media.server.komga.apiModule
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage
 import java.nio.file.Path
@@ -20,7 +21,7 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApiTest {
 
-    private val baseURL = "http://192.168.86.3:8081/api"
+    private val baseURL = Constant.baseUrl
     private val requests = TlpRequests()
     private val parser = TlpResponseUtil()
     private val workingDir: Path = Paths.get("test_gallery")
