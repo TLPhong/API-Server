@@ -142,7 +142,7 @@ class MangaFolderService private constructor() {
                     chapter = it.chapter
                 )
             }
-            val hasNext = chunked.size > pageNum + 1
+            val hasNext = chunked.size > chunkIndex + 1
             MangasPage(
                 mangas = mangaList,
                 hasNext

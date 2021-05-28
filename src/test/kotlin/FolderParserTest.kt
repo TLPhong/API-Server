@@ -1,42 +1,63 @@
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertAll
+import org.junit.jupiter.api.*
 import tlp.media.server.komga.parser.FolderParser
 import tlp.media.server.komga.model.Manga
 import tlp.media.server.komga.constant.Constant
+import tlp.media.server.komga.service.MangaFolderService
+import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FolderParserTest {
+    private val workingDir: Path = Paths.get(Constant.galleryPath)
+    private var testResources: TestResources? = null
+    @BeforeAll
+    fun setup() {
+        testResources = TestResources(
+            workingDir, listOf(
+                ZipFileEntry("test_manga_1.zip", "123tlp")
+            )
+        )
+        MangaFolderService.instance
+    }
+
+    @AfterAll
+    fun tearDown() {
+        testResources?.deleteGalleryDir()
+    }
 
     @Test
     @DisplayName("Test folder parser")
     fun test_folder_parser_basic() {
         val pathString =
-            """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download\(Kemoket 6) [Kemono Ekaki no Kousoku 2 (Sindoll)] Spell Magic [1069618]"""
-        val expectedDescription = """Scans by Super Shanko.
+            """${Constant.galleryPath}/[White Island (Mashima Saki)] Fate colors V (FateGrand Order) [1861415]"""
+        val expectedDescription = """(C98) [White Island (マシマサキ)] Fate colors V (FateGrand Order)
+https://www.melonbooks.co.jp/detail/detail.php?product_id=682657
+https://www.pixiv.net/artworks/81198748
 
-Advertisement: Let me tell you something, brother! If you're in need of some nice or even big ass scans at a decent rate, then you come see Super Shanko, brother! He'll use that 600dpi resolution to ensure you've got nice looking work that'll be just as sweet 10 years from now, and you'd better believe it, brother!
+Artist Information:
+マシマサキ:
+Pixiv: https://www.pixiv.net/users/18403608
+Twitter: https://twitter.com/mashima_saki
+HP:http://turuma.blog.fc2.com/
 """
 
         val expected = Manga(
-            "sindoll",
+            "",
             description = expectedDescription,
-            thumbnail_url = "${Constant.baseUrl}/manga/1069618/01_Scan_Cover.png/thumbnail",
-            title = "(Kemoket 6) [Kemono Ekaki no Kousoku 2 (Sindoll)]  Spell Magic",
-            url = "/${Constant.baseApiPath}/manga/1069618"
+            thumbnail_url = "${Constant.baseUrl}/manga/1861415/1.png/thumbnail",
+            title = "[White Island (Mashima Saki)] Fate colors V (Fate/Grand Order)",
+            url = "/${Constant.baseApiPath}/manga/1861415"
         )
 
         val path = Paths.get(pathString)
         val parse = FolderParser(path).parse()
         val mangaParsed = Manga.fromMangaFolder(parse)
         assertAll(
-            { assertEquals(mangaParsed.description, expected.description) },
-            { assertEquals(mangaParsed.thumbnail_url, expected.thumbnail_url) },
-            { assertEquals(mangaParsed.artist, expected.artist) },
-            { assertEquals(mangaParsed.title, expected.title) },
-            { assertEquals(mangaParsed.url, expected.url) }
+            { assertEquals(expected.description, mangaParsed.description) },
+            { assertEquals(expected.thumbnail_url, mangaParsed.thumbnail_url) },
+            { assertEquals(expected.artist, mangaParsed.artist) },
+            { assertEquals(expected.title, mangaParsed.title) },
+            { assertEquals(expected.url, mangaParsed.url) }
         )
     }
 }
