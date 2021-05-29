@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ master, remade_unit_test ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, remade_unit_test ]
+    branches: [ master ]
 
   workflow_dispatch:
 
