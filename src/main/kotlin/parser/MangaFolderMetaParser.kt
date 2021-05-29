@@ -5,7 +5,7 @@ import tlp.media.server.komga.model.Tag
 import java.nio.file.Files
 import java.nio.file.Path
 
-class GalleryInfoParser(metaFile: Path) {
+class MangaFolderMetaParser(metaFile: Path) {
     val allLines: List<String> = Files.readAllLines(metaFile)
 
     fun parse(): GalleryInfo {

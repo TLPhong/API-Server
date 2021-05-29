@@ -1,12 +1,11 @@
 import org.junit.jupiter.api.*
 import tlp.media.server.komga.constant.Constant
-import tlp.media.server.komga.parser.GalleryInfoParser
+import tlp.media.server.komga.parser.MangaFolderMetaParser
 import tlp.media.server.komga.service.MangaFolderService
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class GalleryInfoParserTest {
+class MangaFolderMetaParserTest {
 
     private val workingDir: Path = Paths.get(Constant.galleryPath)
     private var testResources: TestResources? = null
@@ -31,7 +30,7 @@ class GalleryInfoParserTest {
         val pathString =
             """test_gallery/[White Island (Mashima Saki)] Fate colors V (FateGrand Order) [1861415]/galleryinfo.txt"""
         val galleryMetaPath = Paths.get(pathString)
-        val profile = GalleryInfoParser(galleryMetaPath)
+        val profile = MangaFolderMetaParser(galleryMetaPath)
         profile.parse()
     }
 }
