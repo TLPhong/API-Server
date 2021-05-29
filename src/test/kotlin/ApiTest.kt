@@ -3,15 +3,16 @@ import client.TlpResponseUtil
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import tlp.media.server.komga.service.MangaFolderService
 import tlp.media.server.komga.apiModule
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage
+import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -20,12 +21,27 @@ import kotlin.test.assertTrue
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApiTest {
 
-    private val baseURL = "http://192.168.86.3:8081/api"
+    private val baseURL = Constant.baseUrl
     private val requests = TlpRequests()
     private val parser = TlpResponseUtil()
+    private val workingDir: Path = Paths.get(Constant.galleryPath)
+    private var testResources: TestResources? = null
 
-    init {
+
+    @BeforeAll
+    fun setup() {
+        testResources = TestResources(
+            workingDir, listOf(
+                ZipFileEntry("test_manga_1.zip", "123tlp"),
+                ZipFileEntry("test_manga_2.zip", "123tlp")
+            )
+        )
         MangaFolderService.instance
+    }
+
+    @AfterAll
+    fun tearDown() {
+        testResources?.deleteGalleryDir()
     }
 
 
@@ -60,16 +76,36 @@ class ApiTest {
                 val content = response.content!!
                 val mangasPage: MangasPage = parser.parseMangasPage(content)
                 assertFalse(mangasPage.mangas.isEmpty())
-                assertTrue(mangasPage.hasNextPage)
+                assertEquals(2, mangasPage.mangas.count())
             }
         }
     }
 
     @Test
+    @DisplayName("Test paging correct")
+    fun test_latest_api_call_paging_correct() {
+        withTestApplication(Application::apiModule) {
+            with(handleRequest(HttpMethod.Get, "api/latest?page=1&size=10")) {
+                val content = response.content!!
+                val mangasPage: MangasPage = parser.parseMangasPage(content)
+
+                assertFalse(mangasPage.hasNextPage)
+            }
+            with(handleRequest(HttpMethod.Get, "api/latest?page=1&size=1")) {
+                val content = response.content!!
+                val mangasPage: MangasPage = parser.parseMangasPage(content)
+
+                assertTrue(mangasPage.hasNextPage)
+            }
+        }
+    }
+
+
+    @Test
     @DisplayName("Manga API call return OK")
     fun test_manga_api_call_ok() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/manga/1069618")) {
+            with(handleRequest(HttpMethod.Get, "api/manga/1861415")) {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
@@ -81,7 +117,7 @@ class ApiTest {
     @DisplayName("Manga API can parse")
     fun test_manga_api_can_parse() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/manga/1069618")) {
+            with(handleRequest(HttpMethod.Get, "api/manga/1861415")) {
                 val content = response.content!!
                 val mangaWithChapter: MangaWithChapter = parser.parseManga(content)
                 assertFalse(mangaWithChapter.manga.title.isEmpty())
@@ -93,7 +129,7 @@ class ApiTest {
     @DisplayName("Get image call return OK")
     fun test_image_api_call_ok() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/manga/1069618/18_Scan_17.png")) {
+            with(handleRequest(HttpMethod.Get, "api/manga/1861415/7_8.png")) {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("image/png", response.headers["content-type"])
                 assertNotNull(response.byteContent)
@@ -102,7 +138,7 @@ class ApiTest {
         }
     }
 
-    @ParameterizedTest()
+    @ParameterizedTest
     @ValueSource(ints = [5, 15, 9999])
     @DisplayName("Client util test OK")
     fun test_latest_api_call_client_parser(input: Int) {
@@ -114,8 +150,8 @@ class ApiTest {
                     assertTrue(mangasPage.mangas.size < input)
                     assertFalse(mangasPage.hasNextPage)
                 } else {
-                    assertEquals(input, mangasPage.mangas.size)
-                    assertTrue(mangasPage.hasNextPage)
+                    assertEquals(2, mangasPage.mangas.size)
+                    assertFalse(mangasPage.hasNextPage)
                 }
             }
         }
@@ -125,7 +161,7 @@ class ApiTest {
     @DisplayName("Page list API call return OK")
     fun test_page_list_call_ok() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/manga/1069618/pages")) {
+            with(handleRequest(HttpMethod.Get, "api/manga/1861415/pages")) {
                 assertEquals(HttpStatusCode.OK, response.status())
                 assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
@@ -137,7 +173,7 @@ class ApiTest {
     @DisplayName("Page list API can parse")
     fun test_page_list_call_parse() {
         withTestApplication(Application::apiModule) {
-            with(handleRequest(HttpMethod.Get, "api/manga/1069618/pages")) {
+            with(handleRequest(HttpMethod.Get, "api/manga/1861415/pages")) {
                 val content = response.content!!
                 val parsePageList = parser.parsePageList(content)
                 assertFalse(parsePageList.isEmpty())

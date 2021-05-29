@@ -1,7 +1,8 @@
 package tlp.media.server.komga.service
 
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.*
-import tlp.media.server.komga.parser.MangaFolderParser
+import tlp.media.server.komga.parser.GalleryFolderParser
 import java.io.File
 import java.nio.file.Paths
 import kotlin.random.Random
@@ -13,8 +14,7 @@ class MangaFolderService private constructor() {
     companion object {
         val instance = MangaFolderService()
     }
-
-    private val downloadDir = """D:\Videos\Porn\H_H\HentaiAtHome_1.6.0\download"""
+    private val downloadDir = Constant.galleryPath
     private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
     private var seed = Random.nextLong()
 
@@ -82,7 +82,7 @@ class MangaFolderService private constructor() {
     }
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
-        return MangaFolderParser(Paths.get(downloadDir))
+        return GalleryFolderParser(Paths.get(downloadDir))
             .parse(useProgressBar = false, showDetailLog = false)
             .map { it.id to it }
             .toMap()
@@ -142,7 +142,7 @@ class MangaFolderService private constructor() {
                     chapter = it.chapter
                 )
             }
-            val hasNext = chunked.size > pageNum + 1
+            val hasNext = chunked.size > chunkIndex + 1
             MangasPage(
                 mangas = mangaList,
                 hasNext

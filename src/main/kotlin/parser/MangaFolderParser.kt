@@ -1,74 +1,84 @@
 package tlp.media.server.komga.parser
 
 import io.ktor.util.*
-import me.tongfei.progressbar.ProgressBar
-import me.tongfei.progressbar.ProgressBarBuilder
-import me.tongfei.progressbar.ProgressBarStyle
-import mu.KotlinLogging
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.MangaFolder
+import tlp.media.server.komga.model.Page
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.math.log
-import kotlin.streams.toList
 
-class MangaFolderParser(val rootFolder: Path) {
+class MangaFolderParser(val rootPath: Path) {
 
-    private val logger = KotlinLogging.logger("Folder parser")
+    private lateinit var metaFile: Path
+    private lateinit var imageList: List<Path>
+    private var id: String
+    private val baseUrl = Constant.baseUrl
+    private val metaFileName = "galleryinfo.txt"
 
     init {
-        if (!Files.isDirectory(rootFolder)) {
-            error("Path is not a folder: $rootFolder")
-        }
-
+        validateIsFolder()
+        validateContent()
+        id = getId()
     }
 
-    private fun createProgressBar(total: Number): ProgressBar {
-        val progressBar = ProgressBarBuilder()
-            .setTaskName("Parse")
-            .setInitialMax(total.toLong())
-            .setStyle(ProgressBarStyle.ASCII)
-            .build()
-        progressBar.extraMessage = "Reading..."
-        return progressBar
+    private fun parserError(message: String): Nothing = throw ParserException(message)
+
+    fun parse(): MangaFolder {
+        sortImageList()
+        val pages = imageList
+            .mapIndexed { index, path ->
+                val fileName = path.fileName
+                val url = "$baseUrl/manga/$id/$fileName"
+                path to Page(index, imageUrl = url)
+            }
+        val galleryInfo = MangaFolderMetaParser(metaFile).parse()
+        return MangaFolder(id, galleryInfo, pages)
     }
 
-    fun parse(useProgressBar: Boolean = true, showDetailLog: Boolean = false): List<MangaFolder> {
-        val mangasFolderList = Files.list(rootFolder).toList()
-        val progressBar: ProgressBar? = if (useProgressBar) {
-            createProgressBar(mangasFolderList.size)
+
+    private fun getId(): String {
+        val fileName = rootPath.fileName!!.toString()
+        val startIndex = fileName.lastIndexOf("[")
+        val endIndex = fileName.lastIndexOf("]")
+
+        return if (startIndex > 0 && endIndex > 0) {
+            fileName.substring(startIndex + 1, endIndex)
         } else {
-            null
+            parserError("Dir name missing ID")
         }
-        //------------------------------------------
-        logger.info { "Start parsing $rootFolder" }
-        val mangaFolderList = mangasFolderList
-            .onEach {
-                if (showDetailLog) logger.info { "Process ${it.fileName}" }
-            }
-            .filterNotNull()
-            .mapNotNull {
-                try {
-                    if (showDetailLog) logger.info { "Validate folder ${it.fileName}" }
-                    val folderParser = FolderParser(it)
-                    if (showDetailLog) logger.info { "Parsing ${it.fileName}" }
-
-                    return@mapNotNull folderParser.parse()
-                } catch (parserException: ParserException) {
-                    logger.warn("Parsing error: ${parserException.message}")
-                } catch (exception: Exception) {
-                    logger.error(exception)
-                }
-                return@mapNotNull null
-            }
-            .onEach {
-                if (showDetailLog) logger.info { "Complete parse ${it.title}" }
-                progressBar?.step()
-            }
-        logger.info { "Finished parsing ${mangaFolderList.size} folder" }
-        progressBar?.extraMessage = "Finished"
-        progressBar?.close()
-        return mangaFolderList
     }
 
+    private fun validateIsFolder() {
+        if (!Files.exists(rootPath)) {
+            parserError("Path not exist $rootPath")
+        }
 
+        if (!Files.isDirectory(rootPath)) {
+            parserError("Path is not a directory $rootPath")
+        }
+    }
+
+    private fun sortImageList() {
+       this.imageList = this.imageList.sortedWith(naturalOrder())
+    }
+
+    private fun validateContent() {
+        var metaFile: Path? = null
+        val imageList: MutableList<Path> = mutableListOf()
+
+        Files.list(rootPath)
+            .forEach { path ->
+                //Handle meta file
+                if (path.fileName.toString() == metaFileName) metaFile = path
+                //Handle image file
+                val extension = path.fileName.extension
+                if (extension == "png" || extension == "jpg") imageList.add(path)
+            }
+
+        if (imageList.isEmpty()) parserError("Missing image files")
+        else this.imageList = imageList
+
+        if (metaFile == null) parserError("Missing meta file")
+        else this.metaFile = metaFile as Path
+    }
 }

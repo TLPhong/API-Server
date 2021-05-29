@@ -20,10 +20,10 @@ val PipelineContext<Unit, ApplicationCall>.logger: KLogger
     get() = KotlinLogging.logger("Route ${this.call.request.uri}")
 
 fun Application.apiModule() {
-//    val klaxon = Klaxon()
     val mangaFolderService = MangaFolderService.instance
     val imageReaderService = ImageReaderService.instance
     routing {
+
         route("api") {
             get("latest") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()

@@ -2,10 +2,11 @@ package client
 
 import okhttp3.Request
 import okhttp3.HttpUrl
+import tlp.media.server.komga.constant.Constant;
 
 class TlpRequests {
-    val host = "192.168.86.3"
-    val port = 8081
+    val host = Constant.host
+    val port = Constant.port
 
     fun latestMangas(page: Int, pageSize: Int = 60): Request {
         val httpUrl = urlBuilder()

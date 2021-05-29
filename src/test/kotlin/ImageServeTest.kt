@@ -1,20 +1,37 @@
 import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.*
 import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.service.MangaFolderService
+import java.nio.file.Path
+import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ImageServeTest {
-    init {
+    private val workingDir: Path = Paths.get(Constant.galleryPath)
+    private var testResources: TestResources? = null
+
+    @BeforeAll
+    fun setup() {
+        testResources = TestResources(
+            workingDir, listOf(
+                ZipFileEntry("test_manga_1.zip", "123tlp")
+            )
+        )
         MangaFolderService.instance
     }
-    val testImage = "manga/1069618/18_Scan_17.png"
+
+    @AfterAll
+    fun tearDown() {
+        testResources?.deleteGalleryDir()
+    }
+
+    val testImage = "manga/1861415/15_16.png"
     val contentType = ContentType.Image.PNG
 
     @Test
