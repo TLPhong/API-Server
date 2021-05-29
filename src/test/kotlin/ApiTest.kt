@@ -20,24 +20,23 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApiTest {
+    private var testResources: TestResources? = null;
 
-    private val baseURL = Constant.baseUrl
-    private val requests = TlpRequests()
-    private val parser = TlpResponseUtil()
-    private val workingDir: Path = Paths.get(Constant.galleryPath)
-    private var testResources: TestResources? = null
-
-
-    @BeforeAll
-    fun setup() {
+    init {
         testResources = TestResources(
-            workingDir, listOf(
+            Paths.get(Constant.galleryPath),
+            listOf(
                 ZipFileEntry("test_manga_1.zip", "123tlp"),
                 ZipFileEntry("test_manga_2.zip", "123tlp")
             )
         )
         MangaFolderService.instance
     }
+
+    private val baseURL = Constant.baseUrl
+    private val requests = TlpRequests()
+    private val parser = TlpResponseUtil()
+
 
     @AfterAll
     fun tearDown() {

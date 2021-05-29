@@ -9,16 +9,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  TestSelfHost:
-    runs-on: [self-hosted, Windows]
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: '8'
   Test:
     runs-on: ubuntu-20.04
     steps:
@@ -34,6 +24,17 @@ jobs:
         with:
           maven-version: 3.6.3
       - name: Install dependencies
-        run: mvn validate
-      - name: Pass test
-        run: mvn test
+        run: mvn clean validate
+      - name: Install package
+        run: mvn package
+
+  TestSelfHost:
+    runs-on: [ self-hosted, Windows ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'

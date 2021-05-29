@@ -24,7 +24,7 @@
         <main.class>tlp.media.server.komga.ApplicationKt</main.class>
         <kotlin.version>1.5.0</kotlin.version>
         <ktor.version>1.5.0</ktor.version>
-        <serialization.version>1.2.1</serialization.version>
+        <serialization.version>1.1.0</serialization.version>
     </properties>
     <dependencies>
         <!--Compile-->
@@ -37,11 +37,6 @@
             <groupId>io.ktor</groupId>
             <artifactId>ktor-server-netty</artifactId>
             <version>${ktor.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlinx</groupId>
-            <artifactId>kotlinx-serialization-json</artifactId>
-            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.github.microutils</groupId>
@@ -138,6 +133,12 @@
             <artifactId>zip4j</artifactId>
             <version>2.7.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>3.3.0</version>
+            <type>maven-plugin</type>
+        </dependency>
     </dependencies>
 
     <build>
@@ -148,7 +149,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.3.0</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
                 <executions>
                     <execution>
                         <id>make-assembly</id>
