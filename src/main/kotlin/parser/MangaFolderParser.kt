@@ -59,28 +59,7 @@ class MangaFolderParser(val rootPath: Path) {
     }
 
     private fun sortImageList() {
-        val stringImageList = mutableListOf<Path>()
-        val integerImageList = mutableListOf<Path>()
-
-        //Could stop after detect more than two string
-        this.imageList.forEach { imagePath ->
-            val fileName = imagePath.fileName.toString()
-            val fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."))
-            if (fileNameNoExt.toIntOrNull() != null) {
-                integerImageList.add(imagePath)
-            } else {
-                stringImageList.add(imagePath)
-            }
-        }
-
-        if (stringImageList.size == 1) {
-            integerImageList.sortBy { imagePath ->
-                val fileName = imagePath.fileName.toString()
-                val fileNameNoExt = fileName.substring(0, fileName.lastIndexOf("."))
-                fileNameNoExt.toInt()
-            }
-            this.imageList = stringImageList + integerImageList
-        }
+       this.imageList = this.imageList.sortedWith(naturalOrder())
     }
 
     private fun validateContent() {
