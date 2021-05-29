@@ -4,7 +4,7 @@ on:
   push:
     branches: [ master, remade_unit_test ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, remade_unit_test ]
 
   workflow_dispatch:
 
@@ -13,5 +13,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: mvn validate
       - name: Pass test
         run: mvn test
