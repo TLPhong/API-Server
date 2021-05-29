@@ -2,14 +2,24 @@ name: CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, self_host_ci ]
   pull_request:
     branches: [ master ]
 
   workflow_dispatch:
 
 jobs:
-  build:
+  TestSelfHost:
+    runs-on: [self-hosted, Windows]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+  Test:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
