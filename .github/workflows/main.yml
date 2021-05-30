@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ master, self_host_ci ]
+    branches: [ master ]
   pull_request:
     branches: [ master ]
 
@@ -12,8 +12,8 @@ jobs:
   Build_maven:
     runs-on: ubuntu-20.04
     steps:
-      - name: Clean workspace
-        uses: AutoModality/action-clean@v1
+      - name: Clean workspace after
+        uses: mickem/clean-after-action@v1
 
       - name: Setup workspace
         uses: actions/checkout@v2
@@ -50,22 +50,22 @@ jobs:
           retention-days: 1
       - uses: AutoModality/action-clean@v1
 
-  TestSelfHost:
+  Deploy:
     runs-on: [ self-hosted, Windows ]
     needs: Build_maven
     steps:
-      - name: Clean workspace
+      - name: Clean workspace after
         uses: mickem/clean-after-action@v1
 
       - name: Stop service
         run: net stop tlp_api_service; exit 0
 
-      - name: Download build actifacts
+      - name: Download actifacts
         uses: actions/download-artifact@v2
         with:
           name: Temporary artifacts
 
-      - name: Move actifact
+      - name: Move artifact
         run: |
           dir
           xcopy /Y /s KomgaAPI-1.0-SNAPSHOT-all.jar ${{ secrets.DEPLOY_PATH }}
