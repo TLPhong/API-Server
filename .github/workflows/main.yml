@@ -9,32 +9,64 @@ on:
   workflow_dispatch:
 
 jobs:
-  Test:
+  Build_maven:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
       - name: Setup Java
         uses: actions/setup-java@v2
         with:
           distribution: 'zulu'
           java-version: '8'
+
       - name: Setup maven
         uses: stCarolas/setup-maven@v4
         with:
           maven-version: 3.6.3
+
       - name: Install dependencies
         run: mvn clean validate
-      - name: Install package
+
+      - name: Packaging
         run: mvn package
+
+      - name: Move to actifacts folder
+        run:
+          mkdir ~/artifacts
+          mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI-1.0-SNAPSHOT-all.jar
+          ls -lah ~/artifacts
+
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          name: Temporary artifacts
+          path: /artifacts
+          if-no-files-found: error
+          retention-days: 1
 
   TestSelfHost:
     runs-on: [ self-hosted, Windows ]
+    needs: Build_maven
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v2
+
+      - name: Stop service
+        run: CMD /c  net stop tlp_api_service
+
+      - name: Download build actifacts
+        uses: actions/download-artifact@v2
         with:
-          distribution: 'zulu'
-          java-version: '8'
+          name: Temporary artifacts
+
+      - name: Move actifact
+        run:
+          dir
+          cd "Temporary artifacts"
+          xcopy /Y /s KomgaAPI-1.0-SNAPSHOT-all.jar %destination_dir%
+
+      - name: Start service
+        run: net start tlp_api_service
+
