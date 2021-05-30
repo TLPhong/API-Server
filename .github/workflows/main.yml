@@ -27,10 +27,10 @@ jobs:
           maven-version: 3.6.3
 
       - name: Install dependencies
-        run: mvn clean validate
+        run: mvn --batch-mode clean validate
 
       - name: Packaging
-        run: mvn package
+        run: mvn --batch-mode package
 
       - name: Move to actifacts folder
         run: |
