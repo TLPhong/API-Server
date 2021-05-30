@@ -54,7 +54,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Stop service
-        run: net stop tlp_api_service >$null 2>$null
+        run: net stop tlp_api_service & exit 0
 
       - name: Download build actifacts
         uses: actions/download-artifact@v2
