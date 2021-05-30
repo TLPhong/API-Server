@@ -12,9 +12,11 @@ jobs:
   Build_maven:
     runs-on: ubuntu-20.04
     steps:
+      - name: Clean workspace
+        uses: AutoModality/action-clean@v1
+
       - name: Setup workspace
-      - uses: actions/checkout@v2
-      - uses: AutoModality/action-clean@v1
+        uses: actions/checkout@v2
 
       - name: Setup Java
         uses: actions/setup-java@v2
@@ -52,7 +54,7 @@ jobs:
     runs-on: [ self-hosted, Windows ]
     needs: Build_maven
     steps:
-      - name: Setup workspace
+      - name: Clean workspace
         uses: AutoModality/action-clean@v1
 
       - name: Stop service
