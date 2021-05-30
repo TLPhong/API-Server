@@ -1,0 +1,72 @@
+name: Buid and deploy
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  Build_maven:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clean workspace after
+        uses: mickem/clean-after-action@v1
+
+      - name: Setup workspace
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
+      - name: Setup maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+
+      - name: Install dependencies
+        run: mvn --batch-mode clean validate
+
+      - name: Packaging
+        run: mvn --batch-mode package
+
+      - name: Move to actifacts folder
+        run: |
+          mkdir ~/artifacts
+          mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI-1.0-SNAPSHOT-all.jar
+          ls -lah ~/artifacts
+
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          name: Temporary artifacts
+          path: ~/artifacts
+          if-no-files-found: error
+          retention-days: 1
+
+  Deploy:
+    runs-on: [ self-hosted, Windows ]
+    needs: Build_maven
+    steps:
+      - name: Clean workspace after
+        uses: mickem/clean-after-action@v1
+
+      - name: Stop service
+        run: net stop tlp_api_service; exit 0
+
+      - name: Download actifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: Temporary artifacts
+
+      - name: Move artifact
+        run: |
+          dir
+          xcopy /Y /s KomgaAPI-1.0-SNAPSHOT-all.jar ${{ secrets.DEPLOY_PATH }}
+
+      - name: Start service
+        run: net start tlp_api_service
+
