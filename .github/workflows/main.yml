@@ -33,7 +33,7 @@ jobs:
         run: mvn package
 
       - name: Move to actifacts folder
-        run:
+        run: |
           mkdir ~/artifacts
           mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI-1.0-SNAPSHOT-all.jar
           ls -lah ~/artifacts
@@ -62,7 +62,7 @@ jobs:
           name: Temporary artifacts
 
       - name: Move actifact
-        run:
+        run: |
           dir
           cd "Temporary artifacts"
           xcopy /Y /s KomgaAPI-1.0-SNAPSHOT-all.jar %destination_dir%
