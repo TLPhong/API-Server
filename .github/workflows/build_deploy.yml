@@ -1,9 +1,7 @@
-name: CI
+name: Buid and deploy
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
     branches: [ master ]
 
   workflow_dispatch:
@@ -48,7 +46,6 @@ jobs:
           path: ~/artifacts
           if-no-files-found: error
           retention-days: 1
-      - uses: AutoModality/action-clean@v1
 
   Deploy:
     runs-on: [ self-hosted, Windows ]

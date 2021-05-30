@@ -1,0 +1,37 @@
+name: Buid and deploy
+on:
+  pull_request:
+    branches: [ master ]
+    types:
+      - opened
+      - reopened
+      - assigned
+
+  workflow_dispatch:
+
+jobs:
+  Test:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Clean workspace after
+        uses: mickem/clean-after-action@v1
+
+      - name: Setup workspace
+        uses: actions/checkout@v2
+
+      - name: Setup Java
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
+      - name: Setup maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.6.3
+
+      - name: Install dependencies
+        run: mvn --batch-mode clean validate
+
+      - name: Test
+        run: mvn --batch-mode test
