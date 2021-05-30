@@ -12,8 +12,9 @@ jobs:
   Build_maven:
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - name: Setup workspace
+      - uses: actions/checkout@v2
+      - uses: AutoModality/action-clean@v1
 
       - name: Setup Java
         uses: actions/setup-java@v2
@@ -45,11 +46,15 @@ jobs:
           path: ~/artifacts
           if-no-files-found: error
           retention-days: 1
+      - uses: AutoModality/action-clean@v1
 
   TestSelfHost:
     runs-on: [ self-hosted, Windows ]
     needs: Build_maven
     steps:
+      - name: Setup workspace
+        uses: AutoModality/action-clean@v1
+
       - name: Stop service
         run: net stop tlp_api_service; exit 0
 
