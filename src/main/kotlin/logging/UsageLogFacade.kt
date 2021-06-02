@@ -1,7 +1,7 @@
 package logging
 /*
 Let there be Gallery
-    IS: Collection of Resource,
+    IS: Collection of Resource
     CAN:
         listing Resource
         add Resource
