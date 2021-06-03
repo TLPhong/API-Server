@@ -14,8 +14,8 @@ class ImageReaderService private constructor() {
     private val imageProcessingService by lazy { ImageProcessingService.instance }
 
     private val cache: Cache<String, ByteArray> = Caffeine.newBuilder()
-        .maximumSize(100)
-        .expireAfterAccess(15, TimeUnit.MINUTES)
+        .maximumSize(50)
+        .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
 
     fun loadImage(path: Path, resized: Boolean): ByteArray {

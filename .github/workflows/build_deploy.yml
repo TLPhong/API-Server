@@ -36,7 +36,7 @@ jobs:
       - name: Move to actifacts folder
         run: |
           mkdir ~/artifacts
-          mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI-1.0-SNAPSHOT-all.jar
+          mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI.jar
           ls -lah ~/artifacts
 
       - name: Publish
@@ -65,7 +65,7 @@ jobs:
       - name: Move artifact
         run: |
           dir
-          xcopy /Y /s KomgaAPI-1.0-SNAPSHOT-all.jar ${{ secrets.DEPLOY_PATH }}
+          xcopy /Y /s KomgaAPI.jar ${{ secrets.DEPLOY_PATH }}
 
       - name: Start service
         run: net start tlp_api_service
