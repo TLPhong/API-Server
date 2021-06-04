@@ -1,0 +1,10 @@
+[ ] AI cache prediction
+[ ]     Create logging system
+[ ]        | detect create
+[ ]        | detect delete
+[ ]        | => Create tracking system
+[ ]                 Create sqlite connector system. Save every resource and update every-run
+[ ]        detect being use
+[ ]             Update usage into sqlite
+[ ]     Create prediction module
+
