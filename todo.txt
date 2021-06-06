@@ -3,7 +3,12 @@
 [ ]        | detect create
 [ ]        | detect delete
 [ ]        | => Create tracking system
-[ ]                 Create sqlite connector system. Save every resource and update every-run
+[ ]                 Create SqlLite connector
+[ ]                     Update to Sqlite after scan
+[ ]                         Create
+[ ]                         Delete
+[ ]                         Update
+[ ]                     Optimize scanning
 [ ]        detect being use
 [ ]             Update usage into sqlite
 [ ]     Create prediction module
