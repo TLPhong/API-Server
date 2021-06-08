@@ -1,4 +1,4 @@
-package tlp.media.server.komga.parser
+package tlp.media.server.komga.exception
 
 
 
