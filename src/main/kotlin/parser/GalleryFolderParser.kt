@@ -5,6 +5,7 @@ import me.tongfei.progressbar.ProgressBar
 import me.tongfei.progressbar.ProgressBarBuilder
 import me.tongfei.progressbar.ProgressBarStyle
 import mu.KotlinLogging
+import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
 import java.nio.file.Path

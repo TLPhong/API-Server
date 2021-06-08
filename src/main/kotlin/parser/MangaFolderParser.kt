@@ -2,6 +2,7 @@ package tlp.media.server.komga.parser
 
 import io.ktor.util.*
 import tlp.media.server.komga.constant.Constant
+import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
 import java.nio.file.Files
