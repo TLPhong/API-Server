@@ -3,7 +3,7 @@
 [ ]        | detect create
 [ ]        | detect delete
 [ ]        | => Create tracking system
-[ ]                 Create SqlLite connector
+[x]                 Create SqlLite connector
 [ ]                     Update to Sqlite after scan
 [ ]                         Create
 [ ]                         Delete
