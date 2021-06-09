@@ -7,24 +7,19 @@ import java.time.format.DateTimeFormatter
 
 data class MangaFolder(
     val id: String,
-    val meta: GalleryInfo,
+    val meta: MangaInfo,
     val images: List<Pair<Path, Page>>
 ) {
     val thumbnail: Pair<Path, Page> = images.first()
     val title: String = meta.title
+
     val chapter: Chapter
-
-    init {
-        chapter = createChapter()
-    }
-
-    private fun createChapter(): Chapter {
-        return Chapter(
+        get() = Chapter(
             date_upload = parseTimeString(meta.uploadTime),
             name = meta.title,
             url = ApiPaths.pageList(id)
         )
-    }
+
 
     private fun parseTimeString(timeString: String): Long {
         val format = "yyyy-MM-dd HH:mm"

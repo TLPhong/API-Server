@@ -1,6 +1,6 @@
 package tlp.media.server.komga.parser
 
-import tlp.media.server.komga.model.GalleryInfo
+import tlp.media.server.komga.model.MangaInfo
 import tlp.media.server.komga.model.Tag
 import java.nio.file.Files
 import java.nio.file.Path
@@ -8,13 +8,13 @@ import java.nio.file.Path
 class MangaFolderMetaParser(metaFile: Path) {
     val allLines: List<String> = Files.readAllLines(metaFile)
 
-    fun parse(): GalleryInfo {
+    fun parse(): MangaInfo {
         val sections = mapToSection()
         return sectionsToGalleryInfo(sections)
     }
 
-    private fun sectionsToGalleryInfo(sections: Map<String, String>): GalleryInfo {
-        return GalleryInfo(
+    private fun sectionsToGalleryInfo(sections: Map<String, String>): MangaInfo {
+        return MangaInfo(
             title = sections["Title"] ?: "",
             uploadTime = sections["Upload Time"] ?: "",
             uploadBy = sections["Uploaded By"] ?: "",

@@ -6,20 +6,17 @@ import io.ktor.server.netty.*
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import tlp.media.server.komga.constant.Constant
-import tlp.media.server.komga.database.MangaFolderTable
+import tlp.media.server.komga.database.MangaTable
 import database.DatabaseConfig
+import tlp.media.server.komga.database.ImageTable
+import tlp.media.server.komga.database.MangaTagTable
+import tlp.media.server.komga.database.TagTable
 
 private fun configure() {
     DatabaseConfig.initialize()
-    transaction { SchemaUtils.create(MangaFolderTable) }
+    transaction { SchemaUtils.create(MangaTable, ImageTable, TagTable, MangaTagTable) }
 }
 
 fun main() {
     configure()
-    embeddedServer(
-        Netty,
-        port = Constant.port,
-        watchPaths = listOf("""Media/KomgaAPI"""),
-        module = Application::apiModule
-    ).start(wait = true)
 }
