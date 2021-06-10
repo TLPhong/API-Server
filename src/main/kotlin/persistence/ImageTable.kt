@@ -1,10 +1,11 @@
-package tlp.media.server.komga.database
+package persistence
 
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.transactions.transaction
 import tlp.media.server.komga.model.Page
 import java.nio.file.Path
 
@@ -18,19 +19,21 @@ object ImageTable : IntIdTable(name = "images", columnName = "id") {
 
 class ImageEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ImageEntity>(ImageTable) {
-        fun newFromPage(page: Page, path: Path) {
+        fun fromPage(page: Page, path: Path, mangaEntity: MangaEntity) : ImageEntity = transaction {
             ImageEntity.new {
                 pageIndex = page.index
                 systemPath = path.toString()
                 apiPath = page.imageUrl
+                manga = manga
             }
         }
+
     }
 
     var pageIndex by ImageTable.pageIndex
     var systemPath by ImageTable.systemPath
     var apiPath by ImageTable.apiPath
-    val manga by MangaEntity referencedOn ImageTable.manga
+    var manga by MangaEntity referencedOn ImageTable.manga
 }
 
 

@@ -1,4 +1,4 @@
-package tlp.media.server.komga.database
+package persistence
 
 import org.jetbrains.exposed.sql.Table
 
