@@ -19,12 +19,19 @@ object MangaTable : IdTable<String>("mangas") {
 
 class MangaEntity(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, MangaEntity>(MangaTable) {
-
+        fun fromManga(mangaFolder: MangaFolder): MangaFolder {
+//            mangaFolder.
+            TODO()
+        }
     }
 
-    val title by MangaTable.title
+    var title by MangaTable.title
+    var uploadTime by MangaTable.uploadTime
+    var downloaded by MangaTable.downloaded
+    var uploadBy by MangaTable.uploadBy
+    var description by MangaTable.description
     val images by ImageEntity referrersOn ImageTable.manga
-    val tags by TagEntity via MangaTagTable
+    var tags by TagEntity via MangaTagTable
 }
 
 

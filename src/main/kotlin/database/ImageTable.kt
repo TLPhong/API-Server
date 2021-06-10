@@ -18,13 +18,12 @@ object ImageTable : IntIdTable(name = "images", columnName = "id") {
 
 class ImageEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<ImageEntity>(ImageTable) {
-        fun newFromPage(page: Page, path: Path) {
-            ImageEntity.new {
-                pageIndex = page.index
-                systemPath = path.toString()
-                apiPath = page.imageUrl
-            }
+        fun fromPage(page: Page, path: Path) = ImageEntity.new {
+            pageIndex = page.index
+            systemPath = path.toString()
+            apiPath = page.imageUrl
         }
+
     }
 
     var pageIndex by ImageTable.pageIndex
