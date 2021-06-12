@@ -24,7 +24,7 @@ class ImageEntity(id: EntityID<Int>) : IntEntity(id) {
                 pageIndex = page.index
                 systemPath = path.toString()
                 apiPath = page.imageUrl
-                manga = manga
+                manga = mangaEntity
             }
         }
 

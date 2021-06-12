@@ -4,8 +4,7 @@ import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SizedCollection
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import tlp.media.server.komga.model.MangaFolder
 
@@ -22,21 +21,45 @@ object MangaTable : IdTable<String>("mangas") {
 class MangaEntity(id: EntityID<String>) : Entity<String>(id) {
 
     companion object : EntityClass<String, MangaEntity>(MangaTable) {
-        fun fromManga(mangaFolder: MangaFolder): MangaEntity = transaction {
-            val tagEntities = mangaFolder.meta.tags.map { TagEntity.fromTag(it) }
-            val mangaEntity = MangaEntity.new {
-                title = mangaFolder.title
-                uploadTime = mangaFolder.meta.uploadTime
-                downloaded = mangaFolder.meta.downloaded
-                uploadBy = mangaFolder.meta.uploadBy
-                description = mangaFolder.meta.description
-                tags = SizedCollection(tagEntities)
+        fun fromManga(mangaFolder: MangaFolder) {
+
+            val tagEntities = transaction {
+                mangaFolder.meta.tags
+                    .map { tag ->
+                        return@map TagEntity
+                            .find {
+                                TagTable.group eq tag.group
+                                TagTable.name eq tag.name
+                            }
+                            .limit(1)
+                            .firstOrNull() ?: TagEntity.fromTag(tag)
+                    }
             }
-            mangaFolder.images
-                .forEach {
-                    ImageEntity.fromPage(it.second, it.first, mangaEntity)
+
+            val manga = transaction {
+                MangaEntity.findById(mangaFolder.id) ?: MangaEntity.new(mangaFolder.id) {
+                    title = mangaFolder.title
+                    uploadTime = mangaFolder.meta.uploadTime
+                    downloaded = mangaFolder.meta.downloaded
+                    uploadBy = mangaFolder.meta.uploadBy
+                    description = mangaFolder.meta.description
+                }.apply {
+                    tags = SizedCollection(tagEntities)
                 }
-            mangaEntity
+            }
+
+            transaction {
+                mangaFolder.images
+                    .forEach { image ->
+                        ImageEntity
+                            .find {
+                                ImageTable.manga eq manga.id
+                                ImageTable.pageIndex eq image.second.index
+                            }.limit(1)
+                            .firstOrNull() ?: ImageEntity.fromPage(image.second, image.first, manga);
+                    }
+            }
+
         }
     }
 

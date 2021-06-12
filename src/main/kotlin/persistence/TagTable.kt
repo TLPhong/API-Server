@@ -11,6 +11,9 @@ import tlp.media.server.komga.model.Tag
 object TagTable : IntIdTable("tags") {
     val name: Column<String> = varchar("name", length = 255)
     val group: Column<String?> = varchar("group", length = 255).nullable()
+    init {
+        uniqueIndex("unique_tag", group, name)
+    }
 }
 
 class TagEntity(id: EntityID<Int>) : IntEntity(id) {
