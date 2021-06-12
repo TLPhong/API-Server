@@ -12,7 +12,7 @@ import java.nio.file.Path
 
 object ImageTable : IntIdTable(name = "images", columnName = "id") {
     val pageIndex: Column<Int> = integer("page_index")
-    val systemPath: Column<String> = varchar("system_path", length = 255)
+    val systemPath: Column<String> = varchar("system_path", length = 800)
     val apiPath: Column<String> = varchar("api_path", length = 255)
     val manga = reference("manga", MangaTable)
 }
