@@ -7,6 +7,7 @@ import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SizedCollection
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.batchInsert
 import org.jetbrains.exposed.sql.transactions.transaction
 import tlp.media.server.komga.model.MangaFolder
 
@@ -23,19 +24,18 @@ object MangaTable : IdTable<String>("mangas") {
 class MangaEntity(id: EntityID<String>) : Entity<String>(id) {
 
 
-
     companion object : EntityClass<String, MangaEntity>(MangaTable) {
         fun fromManga(mangaFolder: MangaFolder) {
+            //TODO: Performance improvement point
             val tagEntities = transaction {
-                mangaFolder.meta.tags
-                    .map { tag ->
-                        return@map TagEntity
-                            .find {
-                                (TagTable.name eq tag.name) and (TagTable.group eq tag.group)
-                            }
-                            .limit(1)
-                            .firstOrNull() ?: TagEntity.fromTag(tag)
-                    }
+                TagEntity.fromTags(mangaFolder.meta.tags)
+//                mangaFolder.meta.tags
+//                    .map { tag ->
+//                        return@map TagEntity
+//                            .find(tag.group, tag.name)
+//                            .limit(1)
+//                            .firstOrNull() ?: TagEntity.fromTag(tag)
+//                    }
             }
             val manga = transaction {
 
@@ -54,9 +54,8 @@ class MangaEntity(id: EntityID<String>) : Entity<String>(id) {
                 mangaFolder.images
                     .forEach { image ->
                         ImageEntity
-                            .find {
-                                (ImageTable.manga eq manga.id) and (ImageTable.pageIndex eq image.second.index)
-                            }.limit(1)
+                            .find(manga.id.value, image.second.index)
+                            .limit(1)
                             .firstOrNull() ?: ImageEntity.fromPage(image.second, image.first, manga);
                     }
             }

@@ -5,6 +5,8 @@ import org.jetbrains.exposed.dao.IntEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.SizedIterable
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import tlp.media.server.komga.model.Page
 import java.nio.file.Path
@@ -28,6 +30,11 @@ class ImageEntity(id: EntityID<Int>) : IntEntity(id) {
             }
         }
 
+        fun find(mangaId: String, pageIndex: Int): SizedIterable<ImageEntity> {
+            return this.find {
+                (ImageTable.manga eq mangaId) and (ImageTable.pageIndex eq pageIndex)
+            }
+        }
     }
 
     var pageIndex by ImageTable.pageIndex

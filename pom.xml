@@ -27,7 +27,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <main.class>tlp.media.server.komga.ApplicationKt</main.class>
+        <main.class>tlp.media.server.komga.ApplicationEntryKt</main.class>
         <kotlin.version>1.5.0</kotlin.version>
         <ktor.version>1.5.0</ktor.version>
         <serialization.version>1.1.0</serialization.version>
