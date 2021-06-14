@@ -5,6 +5,7 @@ import me.tongfei.progressbar.ProgressBar
 import me.tongfei.progressbar.ProgressBarBuilder
 import me.tongfei.progressbar.ProgressBarStyle
 import mu.KotlinLogging
+import persistence.MangaEntity
 import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
@@ -42,6 +43,7 @@ class GalleryFolderParser(val rootFolder: Path) {
         //------------------------------------------
         logger.info { "Start parsing $rootFolder" }
         val mangaFolderList = mangasFolderList
+            .asSequence()
             .onEach {
                 if (showDetailLog) logger.info { "Process ${it.fileName}" }
             }
@@ -64,6 +66,7 @@ class GalleryFolderParser(val rootFolder: Path) {
                 if (showDetailLog) logger.info { "Complete parse ${it.title}" }
                 progressBar?.step()
             }
+            .toList()
         logger.info { "Finished parsing ${mangaFolderList.size} folder" }
         progressBar?.extraMessage = "Finished"
         progressBar?.close()

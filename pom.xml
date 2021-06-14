@@ -27,10 +27,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <main.class>tlp.media.server.komga.ApplicationKt</main.class>
-        <kotlin.version>1.5.0</kotlin.version>
-        <ktor.version>1.5.0</ktor.version>
+        <main.class>tlp.media.server.komga.ApplicationEntryKt</main.class>
+        <kotlin.version>1.5.10</kotlin.version>
+        <ktor.version>1.6.0</ktor.version>
         <serialization.version>1.1.0</serialization.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
     <dependencies>
         <!--Compile-->
@@ -253,7 +255,7 @@
                     <compilerPlugins>
                         <plugin>kotlinx-serialization</plugin>
                     </compilerPlugins>
-                    <jvmTarget>1.8</jvmTarget>
+                    <jvmTarget>${maven.compiler.target}</jvmTarget>
                 </configuration>
                 <dependencies>
                     <dependency>

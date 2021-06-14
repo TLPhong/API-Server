@@ -14,7 +14,7 @@ data class Manga (
 ) : SManga {
     companion object {
         fun fromMangaFolder(mangaFolder: MangaFolder): Manga {
-            val artist = mangaFolder.meta.getArtist()
+            val artist = mangaFolder.meta.artist
             val description = mangaFolder.meta.description
             val thumbnailUrl = "${mangaFolder.thumbnail.second.imageUrl}/thumbnail"
             val title = mangaFolder.title

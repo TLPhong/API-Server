@@ -83,9 +83,7 @@ class MangaFolderService private constructor() {
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
         return GalleryFolderParser(Paths.get(downloadDir))
-            .parse(useProgressBar = false, showDetailLog = false)
-            .map { it.id to it }
-            .toMap()
+            .parse(useProgressBar = true, showDetailLog = false).associateBy { it.id }
     }
 
 

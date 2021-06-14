@@ -2,6 +2,7 @@ import io.ktor.application.*
 import io.ktor.http.*
 import io.ktor.server.testing.*
 import org.junit.jupiter.api.*
+import persistence.DatabaseConfig
 import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.service.MangaFolderService
@@ -23,11 +24,13 @@ class ImageServeTest {
                 ZipFileEntry("test_manga_1.zip", "123tlp")
             )
         )
+        DatabaseConfig.initialize()
         MangaFolderService.instance
     }
 
     @AfterAll
     fun tearDown() {
+        Paths.get(DatabaseConfig.databaseFileName).toFile().delete()
         testResources?.deleteGalleryDir()
     }
 

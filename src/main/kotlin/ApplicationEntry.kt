@@ -1,17 +1,14 @@
 package tlp.media.server.komga
 
+import ch.qos.logback.classic.Level
 import io.ktor.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
+import persistence.DatabaseConfig
 import tlp.media.server.komga.constant.Constant
-import tlp.media.server.komga.database.MangaFolderTable
-import database.DatabaseConfig
 
 private fun configure() {
-    DatabaseConfig.initialize()
-    transaction { SchemaUtils.create(MangaFolderTable) }
+    DatabaseConfig.initialize(logLevel = Level.INFO)
 }
 
 fun main() {
