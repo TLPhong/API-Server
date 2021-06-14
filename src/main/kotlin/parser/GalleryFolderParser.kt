@@ -63,9 +63,6 @@ class GalleryFolderParser(val rootFolder: Path) {
                 return@mapNotNull null
             }
             .onEach {
-                MangaEntity.fromManga(it)
-            }
-            .onEach {
                 if (showDetailLog) logger.info { "Complete parse ${it.title}" }
                 progressBar?.step()
             }

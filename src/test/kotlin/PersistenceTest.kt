@@ -2,6 +2,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import persistence.*
 import tlp.media.server.komga.constant.Constant
+import tlp.media.server.komga.parser.GalleryFolderParser
 import tlp.media.server.komga.service.MangaFolderService
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -22,7 +23,8 @@ class PersistenceTest {
             )
         )
         DatabaseConfig.initialize()
-        MangaFolderService.instance
+        val mangaFolders = GalleryFolderParser(workingDir).parse(true, showDetailLog = true)
+        mangaFolders.forEach { MangaEntity.fromManga(it) }
     }
 
     @AfterAll
