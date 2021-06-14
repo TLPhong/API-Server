@@ -8,8 +8,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 
 object DatabaseConfig {
+    const val databaseFileName = "data.db"
     fun initialize(logLevel: Level = Level.INFO) {
-        val db = Database.connect("jdbc:sqlite:data.db", "org.sqlite.JDBC")
+        val db = Database.connect("jdbc:sqlite:$databaseFileName", "org.sqlite.JDBC")
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
         root.level = logLevel
         transaction {

@@ -1,4 +1,5 @@
 import org.junit.jupiter.api.*
+import persistence.DatabaseConfig
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.parser.MangaFolderMetaParser
 import tlp.media.server.komga.service.MangaFolderService
@@ -16,11 +17,13 @@ class MangaFolderMetaParserTest {
                 ZipFileEntry("test_manga_1.zip", "123tlp")
             )
         )
+        DatabaseConfig.initialize()
         MangaFolderService.instance
     }
 
     @AfterAll
     fun tearDown() {
+        Paths.get(DatabaseConfig.databaseFileName).toFile().delete()
         testResources?.deleteGalleryDir()
     }
 
