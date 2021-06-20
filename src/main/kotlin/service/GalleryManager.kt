@@ -38,20 +38,19 @@ class GalleryManager private constructor() {
 
     fun getMangaFolders(): Map<String, MangaFolder> = mangaFolderList
 
-    private var mangaFolderList: Map<String, MangaFolder>  = mapOf()
+    private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
-    public fun initialize() {
+     fun initialize() {
         val parserList = loadFromDisk().toList()
         val loadedFromDb = loadFromDb()
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
-        thread(isDaemon = true, priority = 1,name = "Persist to DB" ) {
-            persistManga(mangaFolderList, syncTypeMap)
-        }
+        persistManga(mangaFolderList, syncTypeMap)
+
     }
 
     private fun loadFromDisk(): Sequence<MangaFolderParser> = Files
-        .walk(galleryFolderPath, 1, null)
+        .list(galleryFolderPath)
         .asSequence()
         .filterNotNull()
         .mapNotNull { MangaFolderParser(it) }

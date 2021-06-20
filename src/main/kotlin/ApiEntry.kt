@@ -15,6 +15,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import java.net.URLConnection
 
 val PipelineContext<Unit, ApplicationCall>.logger: KLogger
     get() = KotlinLogging.logger("Route ${this.call.request.uri}")
@@ -95,14 +96,17 @@ fun Application.apiModule() {
                     }
                     get {
                         val path = call.attributes.get(key = imagePathKey)
-                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
+                        val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
+                        call.respondBytes(ContentType.parse(contentType)) {
                             imageReaderService.loadImage(path, resized = false)
                         }
                         logger.info { "Serve ${path.fileName}" }
                     }
                     get("thumbnail") {
                         val path = call.attributes.get(key = imagePathKey)
-                        call.respondBytes(ContentType.parse(Files.probeContentType(path))) {
+                        val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
+
+                        call.respondBytes(ContentType.parse(contentType)) {
                             imageReaderService.loadImage(path, resized = true)
                         }
                         logger.info { "Serve ${path.fileName} compressed" }

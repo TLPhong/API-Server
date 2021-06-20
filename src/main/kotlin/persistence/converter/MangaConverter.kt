@@ -12,7 +12,7 @@ fun MangaFolder.toMangaEntity(): MangaEntity {
     val mangaFolder = this
 
     run {
-        val mangaEntity: MangaEntity? = MangaEntity.findById(mangaFolder.id)
+        val mangaEntity: MangaEntity? = transaction { MangaEntity.findById(mangaFolder.id) }
         if (mangaEntity != null) return mangaEntity
     }
 

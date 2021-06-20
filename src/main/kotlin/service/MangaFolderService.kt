@@ -17,14 +17,16 @@ import kotlin.concurrent.schedule
 class MangaFolderService private constructor() {
     companion object {
         val instance = MangaFolderService()
+
     }
 
-    private val galleryManager = GalleryManager.instance
     private val downloadDir = Constant.galleryPath
-    private var mangaFolders: Map<String, MangaFolder> = galleryManager.getMangaFolders()
+    private var mangaFolders: Map<String, MangaFolder>
     private var seed = Random.nextLong()
 
     init {
+        GalleryManager.instance.initialize()
+        mangaFolders = GalleryManager.instance.getMangaFolders()
 //        scheduleRefreshMangaFolder()
         scheduleRefreshRandom()
     }
@@ -91,7 +93,6 @@ class MangaFolderService private constructor() {
         return GalleryFolderParser(Paths.get(downloadDir))
             .parse(showDetailLog = false).associateBy { it.id }
     }
-
 
     fun getRandomMangaList(pageNum: Int, pageSize: Int = 20): MangasPage {
         val mangas = mangaFolders

@@ -1,9 +1,11 @@
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
-import persistence.*
+import persistence.DatabaseConfig
+import persistence.ImageEntity
+import persistence.MangaEntity
+import persistence.TagEntity
 import tlp.media.server.komga.constant.Constant
-import tlp.media.server.komga.parser.GalleryFolderParser
-import tlp.media.server.komga.persistence.converter.ConverterExtensions.toMangaEntity
+import tlp.media.server.komga.service.GalleryManager
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -23,8 +25,7 @@ class PersistenceTest {
             )
         )
         DatabaseConfig.initialize()
-        val mangaFolders = GalleryFolderParser(workingDir).parse( showDetailLog = true)
-        mangaFolders.forEach { it.toMangaEntity() }
+        GalleryManager.instance.initialize()
     }
 
     @AfterAll
