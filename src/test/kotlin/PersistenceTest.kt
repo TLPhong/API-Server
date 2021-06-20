@@ -3,7 +3,7 @@ import org.junit.jupiter.api.*
 import persistence.*
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.parser.GalleryFolderParser
-import tlp.media.server.komga.service.MangaFolderService
+import tlp.media.server.komga.persistence.converter.ConverterExtensions.toMangaEntity
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -23,8 +23,8 @@ class PersistenceTest {
             )
         )
         DatabaseConfig.initialize()
-        val mangaFolders = GalleryFolderParser(workingDir).parse(true, showDetailLog = true)
-        mangaFolders.forEach { MangaEntity.fromManga(it) }
+        val mangaFolders = GalleryFolderParser(workingDir).parse( showDetailLog = true)
+        mangaFolders.forEach { it.toMangaEntity() }
     }
 
     @AfterAll

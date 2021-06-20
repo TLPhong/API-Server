@@ -10,10 +10,15 @@ import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
+
+/**
+ * Service to interact with mangaFolder list
+ */
 class MangaFolderService private constructor() {
     companion object {
         val instance = MangaFolderService()
     }
+
     private val downloadDir = Constant.galleryPath
     private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
     private var seed = Random.nextLong()
@@ -83,7 +88,7 @@ class MangaFolderService private constructor() {
 
     private fun parseMangasFolder(): Map<String, MangaFolder> {
         return GalleryFolderParser(Paths.get(downloadDir))
-            .parse(useProgressBar = true, showDetailLog = false).associateBy { it.id }
+            .parse(showDetailLog = false).associateBy { it.id }
     }
 
 
