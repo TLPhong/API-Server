@@ -12,6 +12,7 @@ import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage
+import tlp.media.server.komga.service.GalleryManager
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -21,9 +22,14 @@ import kotlin.test.assertTrue
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ApiTest {
-    private var testResources: TestResources? = null;
+    private var testResources: TestResources? = null
 
-    init {
+    private val baseURL = Constant.baseUrl
+    private val requests = TlpRequests()
+    private val parser = TlpResponseUtil()
+
+    @BeforeAll
+    fun setup() {
         testResources = TestResources(
             Paths.get(Constant.galleryPath),
             listOf(
@@ -32,12 +38,9 @@ class ApiTest {
             )
         )
         DatabaseConfig.initialize()
+        GalleryManager.instance.initialize()
         MangaFolderService.instance
     }
-
-    private val baseURL = Constant.baseUrl
-    private val requests = TlpRequests()
-    private val parser = TlpResponseUtil()
 
 
     @AfterAll

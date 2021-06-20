@@ -7,25 +7,22 @@ import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.*
 
-class MangaFolderParser(val rootPath: Path) {
-
-    private lateinit var metaFile: Path
-    private lateinit var imageList: List<Path>
+class MangaFolderParser(private val mangaFolderPath: Path) {
     private var id: String
     private val baseUrl = Constant.baseUrl
     private val metaFileName = "galleryinfo.txt"
 
     init {
-        validateIsFolder()
-        validateContent()
         id = getId()
     }
 
-    private fun parserError(message: String): Nothing = throw ParserException(message)
-
     fun parse(): MangaFolder {
-        sortImageList()
+        val relevantFiles = scanForRelevantFile()
+        val imageList:List<Path> = relevantFiles.imageList.sortedWith(naturalOrder())
+        val metaFile:Path = relevantFiles.metaFile
+
         val pages = imageList
             .mapIndexed { index, path ->
                 val fileName = path.fileName
@@ -37,49 +34,57 @@ class MangaFolderParser(val rootPath: Path) {
     }
 
 
-    private fun getId(): String {
-        val fileName = rootPath.fileName!!.toString()
+    fun getId(): String {
+        val fileName = mangaFolderPath.fileName!!.toString()
         val startIndex = fileName.lastIndexOf("[")
         val endIndex = fileName.lastIndexOf("]")
 
         return if (startIndex > 0 && endIndex > 0) {
             fileName.substring(startIndex + 1, endIndex)
         } else {
-            parserError("Dir name missing ID")
+            throw ParserException("Dir name missing ID")
         }
     }
 
-    private fun validateIsFolder() {
-        if (!Files.exists(rootPath)) {
-            parserError("Path not exist $rootPath")
+    private fun validateFolder() {
+        if (!Files.exists(mangaFolderPath)) {
+            throw ParserException("Path not exist $mangaFolderPath")
         }
 
-        if (!Files.isDirectory(rootPath)) {
-            parserError("Path is not a directory $rootPath")
+        if (!Files.isDirectory(mangaFolderPath)) {
+            throw ParserException("Path is not a directory $mangaFolderPath")
         }
     }
 
-    private fun sortImageList() {
-       this.imageList = this.imageList.sortedWith(naturalOrder())
-    }
+    private data class RelevantFiles(
+        val metaFile: Path,
+        val imageList: List<Path>
+    )
 
-    private fun validateContent() {
+    private fun scanForRelevantFile():RelevantFiles {
+        validateFolder()
+        val acceptedImageExtension: List<String> = listOf("png", "jpg")
         var metaFile: Path? = null
         val imageList: MutableList<Path> = mutableListOf()
 
-        Files.list(rootPath)
-            .forEach { path ->
-                //Handle meta file
-                if (path.fileName.toString() == metaFileName) metaFile = path
-                //Handle image file
-                val extension = path.fileName.extension
-                if (extension == "png" || extension == "jpg") imageList.add(path)
+        for (path in Files.list(mangaFolderPath)) {
+            //Handle meta file
+            if (path.fileName.toString() == metaFileName) {
+                metaFile = path
             }
 
-        if (imageList.isEmpty()) parserError("Missing image files")
-        else this.imageList = imageList
+            //Handle image file
+            if (path.fileName.extension in acceptedImageExtension) {
+                imageList.add(path)
+            }
+        }
 
-        if (metaFile == null) parserError("Missing meta file")
-        else this.metaFile = metaFile as Path
+        if (imageList.isEmpty()) throw ParserException("Missing image files")
+        metaFile = metaFile ?: throw ParserException("Missing meta files")
+
+        return RelevantFiles(
+            imageList = imageList,
+            metaFile = metaFile
+        )
     }
 }

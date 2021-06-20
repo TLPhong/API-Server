@@ -20,20 +20,11 @@ object ImageTable : IntIdTable(name = "images", columnName = "id") {
 }
 
 class ImageEntity(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<ImageEntity>(ImageTable) {
-        fun fromPage(page: Page, path: Path, mangaEntity: MangaEntity) : ImageEntity = transaction {
-            ImageEntity.new {
-                pageIndex = page.index
-                systemPath = path.toString()
-                apiPath = page.imageUrl
-                manga = mangaEntity
-            }
-        }
-
-        fun find(mangaId: String, pageIndex: Int): SizedIterable<ImageEntity> {
+    companion object : IntEntityClass<ImageEntity>(ImageTable){
+        fun find(mangaId: String, pageIndex: Int): ImageEntity? {
             return this.find {
                 (ImageTable.manga eq mangaId) and (ImageTable.pageIndex eq pageIndex)
-            }
+            }.limit(1).firstOrNull()
         }
     }
 

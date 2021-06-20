@@ -22,31 +22,16 @@ object TagTable : IntIdTable("tags") {
 
 class TagEntity(id: EntityID<Int>) : IntEntity(id) {
     companion object : IntEntityClass<TagEntity>(TagTable) {
-        fun fromTag(tag: Tag): TagEntity = transaction {
-            find(tag.group, tag.name)
-                .firstOrNull() ?: TagEntity.new {
-                group = tag.group
-                name = tag.name
-            }
-        }
-
-        fun fromTags(tags: List<Tag>): List<TagEntity> = transaction {
-            val notFoundTags = tags.filter { tag ->
-                find(tag.group, tag.name).firstOrNull() == null
-            }
-            val insertedIds = TagTable.batchInsert(notFoundTags) { tag ->
-                this[TagTable.group] = tag.group
-                this[TagTable.name] = tag.name
-            }.map {
-                it[TagTable.id].value
-            }
-            TagEntity.forIds(insertedIds).toList()
-        }
-
-        fun find(group: String?, name: String): SizedIterable<TagEntity> {
+        fun find(group: String?, name: String): TagEntity? {
             return this.find {
                 (TagTable.name eq name) and (TagTable.group eq group)
-            }.limit(1)
+            }.limit(1).firstOrNull()
+        }
+
+        fun find(name: String): SizedIterable<TagEntity> {
+            return this.find{
+                TagTable.name eq name
+            }
         }
     }
 

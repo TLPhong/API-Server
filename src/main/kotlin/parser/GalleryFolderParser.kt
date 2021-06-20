@@ -1,58 +1,37 @@
 package tlp.media.server.komga.parser
 
 import io.ktor.util.*
-import me.tongfei.progressbar.ProgressBar
-import me.tongfei.progressbar.ProgressBarBuilder
-import me.tongfei.progressbar.ProgressBarStyle
 import mu.KotlinLogging
-import persistence.MangaEntity
 import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.streams.toList
 
-class GalleryFolderParser(val rootFolder: Path) {
+class GalleryFolderParser(private val rootFolder: Path) {
 
     private val logger = KotlinLogging.logger("Folder parser")
+    private val mangaFolderPaths: List<Path>
 
     init {
         if (!Files.isDirectory(rootFolder)) {
             error("Path is not a folder: $rootFolder")
         }
-
+        mangaFolderPaths = Files.list(rootFolder).toList().filterNotNull()
     }
 
-    private fun createProgressBar(total: Number): ProgressBar {
-        val progressBar = ProgressBarBuilder()
-            .setTaskName("Parse")
-            .setInitialMax(total.toLong())
-            .setStyle(ProgressBarStyle.ASCII)
-            .build()
-        progressBar.extraMessage = "Reading..."
-        return progressBar
-    }
-
-    fun parse(useProgressBar: Boolean = true, showDetailLog: Boolean = false): List<MangaFolder> {
-        val mangasFolderList = Files.list(rootFolder).toList()
-        val progressBar: ProgressBar? = if (useProgressBar) {
-            createProgressBar(mangasFolderList.size)
-        } else {
-            null
-        }
+    fun parse(showDetailLog: Boolean = false): List<MangaFolder> {
         //------------------------------------------
         logger.info { "Start parsing $rootFolder" }
-        val mangaFolderList = mangasFolderList
-            .asSequence()
+        val mangaFolderList = mangaFolderPaths
             .onEach {
                 if (showDetailLog) logger.info { "Process ${it.fileName}" }
             }
-            .filterNotNull()
             .mapNotNull {
                 try {
-                    if (showDetailLog) logger.info { "Validate folder ${it.fileName}" }
+                    if (showDetailLog) logger.debug { "Validate folder ${it.fileName}" }
                     val folderParser = MangaFolderParser(it)
-                    if (showDetailLog) logger.info { "Parsing ${it.fileName}" }
+                    if (showDetailLog) logger.debug { "Parsing ${it.fileName}" }
 
                     return@mapNotNull folderParser.parse()
                 } catch (parserException: ParserException) {
@@ -64,12 +43,9 @@ class GalleryFolderParser(val rootFolder: Path) {
             }
             .onEach {
                 if (showDetailLog) logger.info { "Complete parse ${it.title}" }
-                progressBar?.step()
             }
             .toList()
         logger.info { "Finished parsing ${mangaFolderList.size} folder" }
-        progressBar?.extraMessage = "Finished"
-        progressBar?.close()
         return mangaFolderList
     }
 

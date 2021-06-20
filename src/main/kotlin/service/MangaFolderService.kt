@@ -1,26 +1,35 @@
 package tlp.media.server.komga.service
 
-import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.*
-import tlp.media.server.komga.parser.GalleryFolderParser
 import java.io.File
-import java.nio.file.Paths
 import kotlin.random.Random
 import java.util.Timer
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
 
+
+/**
+ * Service to interact with mangaFolder list
+ */
 class MangaFolderService private constructor() {
     companion object {
-        val instance = MangaFolderService()
+        private var privateInstance: MangaFolderService? = null
+        val instance: MangaFolderService
+            get() {
+                if (privateInstance == null) {
+                    privateInstance = MangaFolderService()
+                }
+                return privateInstance!!
+            }
     }
-    private val downloadDir = Constant.galleryPath
-    private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
+
+    private val mangaFolders: Map<String, MangaFolder>
+        get() = GalleryManager.instance.getMangaFolders()
     private var seed = Random.nextLong()
 
     init {
-        scheduleRefreshMangaFolder()
-        scheduleRefreshRandom()
+        GalleryManager.instance.initialize(waitDbSync = false)
+        scheduleRefreshRandomSeed()
     }
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
@@ -57,7 +66,7 @@ class MangaFolderService private constructor() {
                 var totalMatchScore = 0
 
                 if (mangaFolder.title.contains(query, ignoreCase = true)) {
-                    totalMatchScore += 1
+                    totalMatchScore++
                 }
 
                 totalMatchScore += tags.sumOf { tag ->
@@ -80,12 +89,6 @@ class MangaFolderService private constructor() {
             .sortedByDescending { (_, matchScore) -> matchScore }
             .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
     }
-
-    private fun parseMangasFolder(): Map<String, MangaFolder> {
-        return GalleryFolderParser(Paths.get(downloadDir))
-            .parse(useProgressBar = true, showDetailLog = false).associateBy { it.id }
-    }
-
 
     fun getRandomMangaList(pageNum: Int, pageSize: Int = 20): MangasPage {
         val mangas = mangaFolders
@@ -153,18 +156,7 @@ class MangaFolderService private constructor() {
         }
     }
 
-    private fun scheduleRefreshMangaFolder() {
-        val period = TimeUnit.SECONDS.toMillis(90)
-
-        Timer(true).schedule(
-            period,
-            period
-        ) {
-            mangaFolders = parseMangasFolder()
-        }
-    }
-
-    private fun scheduleRefreshRandom() {
+    private fun scheduleRefreshRandomSeed() {
         val period = TimeUnit.HOURS.toMillis(1)
         Timer(true)
             .schedule(

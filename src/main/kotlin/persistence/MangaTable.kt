@@ -22,46 +22,7 @@ object MangaTable : IdTable<String>("mangas") {
 }
 
 class MangaEntity(id: EntityID<String>) : Entity<String>(id) {
-
-
-    companion object : EntityClass<String, MangaEntity>(MangaTable) {
-        fun fromManga(mangaFolder: MangaFolder) {
-            //TODO: Performance improvement point
-            val tagEntities = transaction {
-                TagEntity.fromTags(mangaFolder.meta.tags)
-//                mangaFolder.meta.tags
-//                    .map { tag ->
-//                        return@map TagEntity
-//                            .find(tag.group, tag.name)
-//                            .limit(1)
-//                            .firstOrNull() ?: TagEntity.fromTag(tag)
-//                    }
-            }
-            val manga = transaction {
-
-                MangaEntity.findById(mangaFolder.id) ?: MangaEntity.new(mangaFolder.id) {
-                    title = mangaFolder.title
-                    uploadTime = mangaFolder.meta.uploadTime
-                    downloaded = mangaFolder.meta.downloaded
-                    uploadBy = mangaFolder.meta.uploadBy
-                    description = mangaFolder.meta.description
-                }.apply {
-                    tags = SizedCollection(tagEntities)
-                }
-            }
-
-            transaction {
-                mangaFolder.images
-                    .forEach { image ->
-                        ImageEntity
-                            .find(manga.id.value, image.second.index)
-                            .limit(1)
-                            .firstOrNull() ?: ImageEntity.fromPage(image.second, image.first, manga);
-                    }
-            }
-
-        }
-    }
+    companion object : EntityClass<String, MangaEntity>(MangaTable)
 
     var title by MangaTable.title
     var uploadTime by MangaTable.uploadTime
