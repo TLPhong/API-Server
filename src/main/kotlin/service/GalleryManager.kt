@@ -3,8 +3,8 @@ package tlp.media.server.komga.service
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.transactions.transaction
 import persistence.MangaEntity
-import sun.tools.jstat.ParserException
 import tlp.media.server.komga.constant.Constant
+import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.parser.MangaFolderParser
 import tlp.media.server.komga.persistence.converter.toMangaEntity
