@@ -1,13 +1,7 @@
 package tlp.media.server.komga.service
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.*
-import tlp.media.server.komga.parser.GalleryFolderParser
 import java.io.File
-import java.nio.file.Paths
 import kotlin.random.Random
 import java.util.Timer
 import java.util.concurrent.TimeUnit
@@ -19,17 +13,22 @@ import kotlin.concurrent.schedule
  */
 class MangaFolderService private constructor() {
     companion object {
-        val instance = MangaFolderService()
-
+        private var privateInstance: MangaFolderService? = null
+        val instance: MangaFolderService
+            get() {
+                if (privateInstance == null) {
+                    privateInstance = MangaFolderService()
+                }
+                return privateInstance!!
+            }
     }
-    private var mangaFolders: Map<String, MangaFolder>
+
+    private val mangaFolders: Map<String, MangaFolder>
+        get() = GalleryManager.instance.getMangaFolders()
     private var seed = Random.nextLong()
 
     init {
-        runBlocking {
-            GalleryManager.instance.initialize()
-        }
-        mangaFolders = GalleryManager.instance.getMangaFolders()
+        GalleryManager.instance.initialize(waitDbSync = false)
         scheduleRefreshRandomSeed()
     }
 

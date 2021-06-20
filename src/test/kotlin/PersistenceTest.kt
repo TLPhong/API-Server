@@ -27,7 +27,7 @@ class PersistenceTest {
         )
         DatabaseConfig.initialize()
         runBlocking {
-            GalleryManager.instance.initialize()
+            GalleryManager.instance.initialize(waitDbSync = true)
         }
     }
 

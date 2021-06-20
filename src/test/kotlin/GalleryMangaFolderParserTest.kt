@@ -21,13 +21,10 @@ class GalleryMangaFolderParserTest {
                 ZipFileEntry("test_manga_2.zip", "123tlp")
             )
         )
-        DatabaseConfig.initialize()
-        MangaFolderService.instance
     }
 
     @AfterAll
     fun tearDown() {
-        Paths.get(DatabaseConfig.databaseFileName).toFile().delete()
         testResources?.deleteGalleryDir()
     }
 

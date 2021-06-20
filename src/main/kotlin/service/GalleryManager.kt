@@ -36,29 +36,33 @@ import kotlin.concurrent.schedule;
  */
 class GalleryManager private constructor() {
     companion object {
-        private val logger = KotlinLogging.logger(GalleryManager::class.java.simpleName)
-
-        private var galleryFolderPath: Path = Paths.get(Constant.galleryPath)
-        val instance: GalleryManager = GalleryManager()
+        private var privateInstance: GalleryManager? = null
+        val instance: GalleryManager
+            get() {
+                if (privateInstance == null) {
+                    privateInstance = GalleryManager()
+                }
+                return privateInstance!!
+            }
     }
+
+    private val logger = KotlinLogging.logger(GalleryManager::class.java.simpleName)
+    private var galleryFolderPath: Path = Paths.get(Constant.galleryPath)
 
     fun getMangaFolders(): Map<String, MangaFolder> = mangaFolderList
 
     private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
     fun initialize(waitDbSync: Boolean = false) {
-        runBlocking {
-            val refreshMangasAsync = refreshMangasAsync()
-            if(waitDbSync){
-                refreshMangasAsync.await()
-            }
-            refreshMangasAsync.invokeOnCompletion {
-                scheduleRefreshing()
-            }
+        val persistMangaThread = refreshMangas {
+            scheduleRefreshing()
+        }
+        if (waitDbSync) {
+            persistMangaThread.join()
         }
     }
 
-    private suspend fun refreshMangasAsync() = coroutineScope {
+    private fun refreshMangas(callback: () -> Unit): Thread {
         logger.trace { "Refreshing manga" }
         logger.trace { "Loading from disk" }
         val parserList = loadFromDisk().toList()
@@ -68,8 +72,9 @@ class GalleryManager private constructor() {
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
 
-        return@coroutineScope async {
+        return thread(name = "persist db", priority = 1, isDaemon = true) {
             persistManga(mangaFolderList, syncTypeMap)
+            callback()
             logger.trace { "Syncing finished" }
         }
     }
@@ -156,8 +161,8 @@ class GalleryManager private constructor() {
             period
         ) {
             runBlocking {
-                refreshMangasAsync().invokeOnCompletion {
-                    scheduleRefreshing()
+                thread(name = "refreshing mangafolders", priority = 1, isDaemon = true) {
+                    refreshMangas { scheduleRefreshing() }
                 }
             }
         }
