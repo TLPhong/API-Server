@@ -12,9 +12,12 @@ import tlp.media.server.komga.persistence.converter.toMangaFolder
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.*
+import java.util.concurrent.TimeUnit
+import kotlin.collections.HashMap
 import kotlin.concurrent.thread
 import kotlin.streams.asSequence
-
+import kotlin.concurrent.schedule;
 
 /***
  * Service that handle parsing/recurring parsing
@@ -40,13 +43,17 @@ class GalleryManager private constructor() {
 
     private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
-     fun initialize() {
+    fun initialize() {
+        refreshMangas()
+        scheduleRefreshing()
+    }
+
+    private fun refreshMangas() {
         val parserList = loadFromDisk().toList()
         val loadedFromDb = loadFromDb()
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
         persistManga(mangaFolderList, syncTypeMap)
-
     }
 
     private fun loadFromDisk(): Sequence<MangaFolderParser> = Files
@@ -126,6 +133,16 @@ class GalleryManager private constructor() {
     }
 
     private fun scheduleRefreshing() {
-        TODO()
+
+        val period = TimeUnit.SECONDS.toMillis(90)
+
+        Timer(true).schedule(
+            period,
+            period
+        ) {
+            thread(isDaemon = true, name = "refresh manga thread", priority = 1) {
+                refreshMangas()
+            }
+        }
     }
 }

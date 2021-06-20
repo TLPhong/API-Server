@@ -28,7 +28,7 @@ class MangaFolderService private constructor() {
         GalleryManager.instance.initialize()
         mangaFolders = GalleryManager.instance.getMangaFolders()
 //        scheduleRefreshMangaFolder()
-        scheduleRefreshRandom()
+        scheduleRefreshRandomSeed()
     }
 
     fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
@@ -160,18 +160,7 @@ class MangaFolderService private constructor() {
         }
     }
 
-//    private fun scheduleRefreshMangaFolder() {
-//        val period = TimeUnit.SECONDS.toMillis(90)
-//
-//        Timer(true).schedule(
-//            period,
-//            period
-//        ) {
-//            mangaFolders = parseMangasFolder()
-//        }
-//    }
-
-    private fun scheduleRefreshRandom() {
+    private fun scheduleRefreshRandomSeed() {
         val period = TimeUnit.HOURS.toMillis(1)
         Timer(true)
             .schedule(
