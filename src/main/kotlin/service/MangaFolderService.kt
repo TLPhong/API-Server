@@ -19,12 +19,13 @@ class MangaFolderService private constructor() {
         val instance = MangaFolderService()
     }
 
+    private val galleryManager = GalleryManager.instance
     private val downloadDir = Constant.galleryPath
-    private var mangaFolders: Map<String, MangaFolder> = parseMangasFolder()
+    private var mangaFolders: Map<String, MangaFolder> = galleryManager.getMangaFolders()
     private var seed = Random.nextLong()
 
     init {
-        scheduleRefreshMangaFolder()
+//        scheduleRefreshMangaFolder()
         scheduleRefreshRandom()
     }
 
@@ -62,7 +63,7 @@ class MangaFolderService private constructor() {
                 var totalMatchScore = 0
 
                 if (mangaFolder.title.contains(query, ignoreCase = true)) {
-                    totalMatchScore += 1
+                    totalMatchScore++
                 }
 
                 totalMatchScore += tags.sumOf { tag ->
@@ -158,16 +159,16 @@ class MangaFolderService private constructor() {
         }
     }
 
-    private fun scheduleRefreshMangaFolder() {
-        val period = TimeUnit.SECONDS.toMillis(90)
-
-        Timer(true).schedule(
-            period,
-            period
-        ) {
-            mangaFolders = parseMangasFolder()
-        }
-    }
+//    private fun scheduleRefreshMangaFolder() {
+//        val period = TimeUnit.SECONDS.toMillis(90)
+//
+//        Timer(true).schedule(
+//            period,
+//            period
+//        ) {
+//            mangaFolders = parseMangasFolder()
+//        }
+//    }
 
     private fun scheduleRefreshRandom() {
         val period = TimeUnit.HOURS.toMillis(1)
