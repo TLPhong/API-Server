@@ -1,5 +1,8 @@
 package tlp.media.server.komga.service
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.model.*
 import tlp.media.server.komga.parser.GalleryFolderParser
@@ -19,13 +22,13 @@ class MangaFolderService private constructor() {
         val instance = MangaFolderService()
 
     }
-
-    private val downloadDir = Constant.galleryPath
     private var mangaFolders: Map<String, MangaFolder>
     private var seed = Random.nextLong()
 
     init {
-        GalleryManager.instance.initialize()
+        runBlocking {
+            GalleryManager.instance.initialize()
+        }
         mangaFolders = GalleryManager.instance.getMangaFolders()
         scheduleRefreshRandomSeed()
     }

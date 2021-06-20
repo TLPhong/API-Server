@@ -1,3 +1,4 @@
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
 import persistence.DatabaseConfig
@@ -25,7 +26,9 @@ class PersistenceTest {
             )
         )
         DatabaseConfig.initialize()
-        GalleryManager.instance.initialize()
+        runBlocking {
+            GalleryManager.instance.initialize()
+        }
     }
 
     @AfterAll

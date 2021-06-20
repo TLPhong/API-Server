@@ -1,7 +1,7 @@
 package tlp.media.server.komga.service
 
+import kotlinx.coroutines.*
 import mu.KotlinLogging
-import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import persistence.MangaEntity
@@ -46,28 +46,32 @@ class GalleryManager private constructor() {
 
     private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
-    fun initialize() {
-        refreshMangas{
-            scheduleRefreshing()
+    fun initialize(waitDbSync: Boolean = false) {
+        runBlocking {
+            val refreshMangasAsync = refreshMangasAsync()
+            if(waitDbSync){
+                refreshMangasAsync.await()
+            }
+            refreshMangasAsync.invokeOnCompletion {
+                scheduleRefreshing()
+            }
         }
     }
 
-    private fun refreshMangas(callback: ()->Unit) {
+    private suspend fun refreshMangasAsync() = coroutineScope {
         logger.trace { "Refreshing manga" }
         logger.trace { "Loading from disk" }
         val parserList = loadFromDisk().toList()
         logger.trace { "Loading from database" }
-        val loadedFromDb:List<String> = loadIdListFromDb()
+        val loadedFromDb: List<String> = loadIdListFromDb()
         logger.trace { "Syncing" }
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
 
-        thread(isDaemon = true, name = "Persisting database", priority = 1) {
+        return@coroutineScope async {
             persistManga(mangaFolderList, syncTypeMap)
-            callback()
             logger.trace { "Syncing finished" }
         }
-
     }
 
     private fun loadFromDisk(): Sequence<MangaFolderParser> = Files
@@ -123,7 +127,7 @@ class GalleryManager private constructor() {
                     }
                 }
 
-                SyncType.DELETED, SyncType.UNCHANGED -> transaction{
+                SyncType.DELETED, SyncType.UNCHANGED -> transaction {
                     MangaEntity[id].toMangaFolder()
                 }
             }
@@ -151,8 +155,8 @@ class GalleryManager private constructor() {
         Timer(true).schedule(
             period
         ) {
-            thread(isDaemon = true, name = "refresh manga thread", priority = 1) {
-                refreshMangas{
+            runBlocking {
+                refreshMangasAsync().invokeOnCompletion {
                     scheduleRefreshing()
                 }
             }
