@@ -27,7 +27,6 @@ class MangaFolderService private constructor() {
     init {
         GalleryManager.instance.initialize()
         mangaFolders = GalleryManager.instance.getMangaFolders()
-//        scheduleRefreshMangaFolder()
         scheduleRefreshRandomSeed()
     }
 
@@ -87,11 +86,6 @@ class MangaFolderService private constructor() {
             .filter { (_, matchScore) -> matchScore > 0 }
             .sortedByDescending { (_, matchScore) -> matchScore }
             .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
-    }
-
-    private fun parseMangasFolder(): Map<String, MangaFolder> {
-        return GalleryFolderParser(Paths.get(downloadDir))
-            .parse(showDetailLog = false).associateBy { it.id }
     }
 
     fun getRandomMangaList(pageNum: Int, pageSize: Int = 20): MangasPage {

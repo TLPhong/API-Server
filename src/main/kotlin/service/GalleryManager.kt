@@ -44,16 +44,28 @@ class GalleryManager private constructor() {
     private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
     fun initialize() {
-        refreshMangas()
-        scheduleRefreshing()
+        refreshMangas{
+            scheduleRefreshing()
+        }
     }
 
-    private fun refreshMangas() {
+    private fun refreshMangas(callback: ()->Unit) {
+        logger.info { "Refreshing manga" }
+        logger.info { "Loading from disk" }
         val parserList = loadFromDisk().toList()
+        logger.info { "Loading from database" }
         val loadedFromDb = loadFromDb()
+
+        logger.info { "Syncing" }
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
-        persistManga(mangaFolderList, syncTypeMap)
+
+        thread(isDaemon = true, name = "Persisting database", priority = 1) {
+            persistManga(mangaFolderList, syncTypeMap)
+            callback()
+            logger.info { "Syncing finished" }
+        }
+
     }
 
     private fun loadFromDisk(): Sequence<MangaFolderParser> = Files
@@ -134,14 +146,15 @@ class GalleryManager private constructor() {
 
     private fun scheduleRefreshing() {
 
-        val period = TimeUnit.SECONDS.toMillis(90)
+        val period = TimeUnit.MINUTES.toMillis(1)
 
         Timer(true).schedule(
-            period,
             period
         ) {
             thread(isDaemon = true, name = "refresh manga thread", priority = 1) {
-                refreshMangas()
+                refreshMangas{
+                    scheduleRefreshing()
+                }
             }
         }
     }
