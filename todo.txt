@@ -1,8 +1,8 @@
 [ ] AI cache prediction
 [ ]     Create logging system
-[ ]        | detect create
-[ ]        | detect delete
-[ ]        | => Create tracking system
+[ ]        | log create
+[ ]        | log delete
+[x]        | => Create tracking system
 [x]                 Create SqlLite connector
 [x]                     Update to Sqlite after scan
 [x]                         Create
