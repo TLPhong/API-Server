@@ -39,11 +39,10 @@ class GalleryManager private constructor(galleryFolderPath: Path) {
 
     public fun initialize() {
         val parserList = loadFromDisk().toList()
-        val loadFromDb = loadFromDb()
-        val syncTypeMap = compareForSyncType(parserList, loadFromDb)
-        val mangaFolderList =
-        //Read to manga folder list here
-        persistManga(syncTypeMap)
+        val loadedFromDb = loadFromDb()
+        val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
+        val mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
+        persistManga(mangaFolderList, syncTypeMap)
     }
 
     private fun loadFromDisk(): Sequence<MangaFolderParser> = Files
@@ -69,13 +68,19 @@ class GalleryManager private constructor(galleryFolderPath: Path) {
         TODO()
     }
 
-    private fun
-
-    private fun persistManga(syncTypeMap: Map<String, MangaFolder>) {
+    private fun loadMangaFolders(
+        parserList: List<MangaFolderParser>,
+        loadedFromDb: List<MangaFolder>,
+        syncTypeMap: Map<String, SyncType>
+    ): List<MangaFolder> {
         TODO()
     }
 
-    private fun scheduleSyncToDb() {
+    private fun persistManga(syncTypeMap: List<MangaFolder>, syncTypeMap1: Map<String, SyncType>) {
+        TODO()
+    }
 
+    private fun scheduleRefreshing() {
+        TODO()
     }
 }
