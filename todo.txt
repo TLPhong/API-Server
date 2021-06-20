@@ -4,11 +4,10 @@
 [ ]        | detect delete
 [ ]        | => Create tracking system
 [x]                 Create SqlLite connector
-[ ]                     Update to Sqlite after scan
-[ ]                         Create
-[ ]                         Delete
-[ ]                         Update
-[ ]                     Optimize scanning
+[x]                     Update to Sqlite after scan
+[x]                         Create
+[x]                         Delete
+[x]                     Optimize scanning
 [ ]        detect being use
 [ ]             Update usage into sqlite
 [ ]     Create prediction module
