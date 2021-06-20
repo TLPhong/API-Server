@@ -1,8 +1,11 @@
 package tlp.media.server.komga.service
 
 import mu.KotlinLogging
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import persistence.MangaEntity
+import persistence.MangaTable
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
@@ -50,20 +53,19 @@ class GalleryManager private constructor() {
     }
 
     private fun refreshMangas(callback: ()->Unit) {
-        logger.info { "Refreshing manga" }
-        logger.info { "Loading from disk" }
+        logger.trace { "Refreshing manga" }
+        logger.trace { "Loading from disk" }
         val parserList = loadFromDisk().toList()
-        logger.info { "Loading from database" }
-        val loadedFromDb = loadFromDb()
-
-        logger.info { "Syncing" }
+        logger.trace { "Loading from database" }
+        val loadedFromDb:List<String> = loadIdListFromDb()
+        logger.trace { "Syncing" }
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
         mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
 
         thread(isDaemon = true, name = "Persisting database", priority = 1) {
             persistManga(mangaFolderList, syncTypeMap)
             callback()
-            logger.info { "Syncing finished" }
+            logger.trace { "Syncing finished" }
         }
 
     }
@@ -74,8 +76,8 @@ class GalleryManager private constructor() {
         .filterNotNull()
         .mapNotNull { MangaFolderParser(it) }
 
-    private fun loadFromDb(): List<MangaFolder> = transaction {
-        MangaEntity.all().map { it.toMangaFolder() }
+    private fun loadIdListFromDb(): List<String> = transaction {
+        MangaTable.slice(MangaTable.id).selectAll().map { it[MangaTable.id].value }
     }
 
     private enum class SyncType {
@@ -86,10 +88,9 @@ class GalleryManager private constructor() {
 
     private fun compareForSyncType(
         physicalManga: Iterable<MangaFolderParser>,
-        persistedMangas: Iterable<MangaFolder>,
+        persistedIdList: Iterable<String>,
     ): Map<String, SyncType> {
         val currentIdList = physicalManga.map { it.getId() }
-        val persistedIdList = persistedMangas.map { it.id }
 
         val createdList = currentIdList.subtract(persistedIdList).associateWith { SyncType.CREATED }
         val deletedList = persistedIdList.subtract(currentIdList).associateWith { SyncType.DELETED }
@@ -102,13 +103,12 @@ class GalleryManager private constructor() {
 
     private fun loadMangaFolders(
         physicalManga: List<MangaFolderParser>,
-        persistedMangas: List<MangaFolder>,
+        persistedIdList: List<String>,
         syncTypeMap: Map<String, SyncType>
     ): Map<String, MangaFolder> {
         val resultMangaFolders: HashMap<String, MangaFolder> = HashMap()
 
         val currentIdList = physicalManga.associateBy { it.getId() }
-        val persistedIdList = persistedMangas.associateBy { it.id }
 
         for ((id, syncType) in syncTypeMap) {
             val mangaFolder: MangaFolder? = when (syncType) {
@@ -123,8 +123,8 @@ class GalleryManager private constructor() {
                     }
                 }
 
-                SyncType.DELETED, SyncType.UNCHANGED -> {
-                    persistedIdList.getOrElse(id) { throw Exception("failed to map $id") }
+                SyncType.DELETED, SyncType.UNCHANGED -> transaction{
+                    MangaEntity[id].toMangaFolder()
                 }
             }
             mangaFolder?.let { resultMangaFolders.put(it.id, it) }
