@@ -37,4 +37,5 @@ class TagEntity(id: EntityID<Int>) : IntEntity(id) {
 
     var group by TagTable.group
     var name by TagTable.name
+    var mangas by MangaEntity via MangaTagTable
 }

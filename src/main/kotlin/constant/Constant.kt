@@ -25,5 +25,6 @@ object Constant {
     val galleryPath: String = reader.properties.getProperty("galleryPath")!!
     val baseUrl = "http://$host:$port/$baseApiPath"
     val logLevel = reader.properties.getProperty("logLevel")?: "INFO"
+    val databaseFileName = reader.properties.getProperty("databaseFileName")!!
 }
 
