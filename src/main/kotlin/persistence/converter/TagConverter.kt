@@ -18,16 +18,25 @@ fun Tag.toTagEntity(): TagEntity = transaction {
 
 fun Iterable<Tag>.toTagEntities(): List<TagEntity> = transaction {
     val tags = this@toTagEntities
-    val notFoundTags = tags.filter { tag ->
-        TagEntity.find(tag.group, tag.name) == null
-    }
+    val notFoundTags = mutableListOf<Tag>()
+    val foundTags:List<TagEntity> = tags
+        .mapNotNull { tag ->
+            val tagEntity = TagEntity.find(tag.group, tag.name)
+            return@mapNotNull if(tagEntity != null){
+                tagEntity
+            }else{
+                notFoundTags.add(tag)
+                null
+            }
+        }
+
     val insertedIds = TagTable.batchInsert(notFoundTags) { tag ->
         this[TagTable.group] = tag.group
         this[TagTable.name] = tag.name
     }.map {
         it[TagTable.id].value
     }
-    TagEntity.forIds(insertedIds).toList()
+    TagEntity.forIds(insertedIds).toList() + foundTags
 }
 
 fun TagEntity.toTag(): Tag = Tag(this.group, this.name)

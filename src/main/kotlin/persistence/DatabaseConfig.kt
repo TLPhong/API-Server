@@ -6,9 +6,10 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
+import tlp.media.server.komga.constant.Constant
 
 object DatabaseConfig {
-    const val databaseFileName = "data.db"
+    val databaseFileName = Constant.databaseFileName
     fun initialize(logLevel: Level = Level.INFO) {
         val db = Database.connect("jdbc:sqlite:$databaseFileName", "org.sqlite.JDBC")
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
