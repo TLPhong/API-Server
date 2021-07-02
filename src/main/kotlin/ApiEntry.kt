@@ -7,6 +7,8 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import mu.KLogger
 import mu.KotlinLogging
 import tlp.media.server.komga.service.ImageReaderService
@@ -16,6 +18,7 @@ import java.nio.file.Path
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 import java.net.URLConnection
+import kotlin.system.measureTimeMillis
 
 val PipelineContext<Unit, ApplicationCall>.logger: KLogger
     get() = KotlinLogging.logger("Route ${this.call.request.uri}")
@@ -96,20 +99,21 @@ fun Application.apiModule() {
                     }
                     get {
                         val path = call.attributes.get(key = imagePathKey)
-                        val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
-                        call.respondBytes(ContentType.parse(contentType)) {
-                            imageReaderService.loadImage(path, resized = false)
+                        val time = measureTimeMillis {
+                            val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
+                            val image = imageReaderService.loadImage(path, resized = false)
+                            call.respondBytes(ContentType.parse(contentType)) { image }
                         }
-                        logger.info { "Serve ${path.fileName}" }
+                        logger.info { "Serve ${path.fileName} in [${time}millis]" }
                     }
                     get("thumbnail") {
                         val path = call.attributes.get(key = imagePathKey)
-                        val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
-
-                        call.respondBytes(ContentType.parse(contentType)) {
-                            imageReaderService.loadImage(path, resized = true)
+                        val time = measureTimeMillis {
+                            val contentType = URLConnection.guessContentTypeFromName(path.fileName.toString())
+                            val image = imageReaderService.loadImage(path, resized = true)
+                            call.respondBytes(ContentType.parse(contentType)) { image }
                         }
-                        logger.info { "Serve ${path.fileName} compressed" }
+                        logger.info { "Serve ${path.fileName} compressed in [${time}millis] " }
 
                     }
                 }

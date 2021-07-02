@@ -2,11 +2,17 @@ package tlp.media.server.komga.service
 
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
+import io.ktor.util.*
+import mu.KotlinLogging
+import org.checkerframework.checker.nullness.qual.Nullable
+import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class ImageReaderService private constructor() {
+    private val logger = KotlinLogging.logger(ImageReaderService::class.java.simpleName)
+
     companion object {
         val instance = ImageReaderService()
     }
@@ -14,26 +20,28 @@ class ImageReaderService private constructor() {
     private val imageProcessingService by lazy { ImageProcessingService.instance }
 
     private val cache: Cache<String, ByteArray> = Caffeine.newBuilder()
-        .maximumSize(50)
+        .maximumSize(20)
         .expireAfterAccess(5, TimeUnit.MINUTES)
         .build()
 
     fun loadImage(path: Path, resized: Boolean): ByteArray {
-        val cacheKey = "${path.toAbsolutePath()}" + if (resized) "|resized" else ""
-        return cache.get(cacheKey) {
-            if (!resized) {
-                loadImage(path)
-            } else {
-                loadCompressed(path)
+        return if (!resized) {
+            loadImage(path)
+        } else {
+            loadCompressed(path)
+        }
+    }
+
+    private fun loadImage(path: Path): ByteArray {
+        return cache.get(path.toString()){
+            Files.newInputStream(path).use { stream ->
+                stream.readBytes()
             }
         }!!
     }
 
-    private fun loadImage(path: Path): ByteArray {
-        return Files.newInputStream(path).use { it.readBytes() }
-    }
-
     private fun loadCompressed(path: Path): ByteArray {
-        return imageProcessingService.resized(path, 600, 800)
+        val byteArrayImage = loadImage(path)
+        return imageProcessingService.resized(byteArrayImage, path.extension, 600, 800)
     }
 }
