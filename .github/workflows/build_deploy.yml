@@ -48,7 +48,7 @@ jobs:
           retention-days: 1
 
   Deploy:
-    runs-on: [ self-hosted, Windows ]
+    runs-on: [self-hosted,Windows]
     needs: Build_maven
     steps:
       - name: Clean workspace after
