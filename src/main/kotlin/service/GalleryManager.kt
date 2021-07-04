@@ -1,6 +1,5 @@
 package tlp.media.server.komga.service
 
-import kotlinx.coroutines.*
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -54,6 +53,7 @@ class GalleryManager private constructor() {
     private var mangaFolderList: Map<String, MangaFolder> = mapOf()
 
     fun initialize(waitDbSync: Boolean = false) {
+        scheduleGarbageCollector()
         val persistMangaThread = refreshMangas {
             scheduleRefreshing()
         }
@@ -70,7 +70,7 @@ class GalleryManager private constructor() {
         val loadedFromDb: List<String> = loadIdListFromDb()
         logger.trace { "Syncing" }
         val syncTypeMap = compareForSyncType(parserList, loadedFromDb)
-        mangaFolderList = loadMangaFolders(parserList, loadedFromDb, syncTypeMap)
+        mangaFolderList = loadMangaFolders(parserList, syncTypeMap)
 
         return thread(name = "persist db", priority = 1, isDaemon = true) {
             persistManga(mangaFolderList, syncTypeMap)
@@ -111,19 +111,18 @@ class GalleryManager private constructor() {
     }
 
     private fun loadMangaFolders(
-        physicalManga: List<MangaFolderParser>,
-        persistedIdList: List<String>,
+        onDiskMangas: List<MangaFolderParser>,
         syncTypeMap: Map<String, SyncType>
     ): Map<String, MangaFolder> {
         val resultMangaFolders: HashMap<String, MangaFolder> = HashMap()
 
-        val currentIdList = physicalManga.associateBy { it.getId() }
+        val onDiskIdList = onDiskMangas.associateBy { it.getId() }
 
         for ((id, syncType) in syncTypeMap) {
-            val mangaFolder: MangaFolder? = when (syncType) {
+            when (syncType) {
                 SyncType.CREATED -> {
                     try {
-                        currentIdList.getOrElse(id) {
+                        onDiskIdList.getOrElse(id) {
                             throw Exception("failed to map $id")
                         }.parse()
                     } catch (exception: ParserException) {
@@ -135,8 +134,9 @@ class GalleryManager private constructor() {
                 SyncType.DELETED, SyncType.UNCHANGED -> transaction {
                     MangaEntity[id].toMangaFolder()
                 }
+            }?.also { mangaFolder ->
+                resultMangaFolders[mangaFolder.id] = mangaFolder
             }
-            mangaFolder?.let { resultMangaFolders.put(it.id, it) }
         }
         return resultMangaFolders
     }
@@ -146,25 +146,28 @@ class GalleryManager private constructor() {
             when (syncTypeMap[id]) {
                 SyncType.CREATED -> mangaFolder.toMangaEntity()
                 SyncType.DELETED -> mangaFolder.toMangaEntity().delete()
-                else -> {
-                    //Skip
+                SyncType.UNCHANGED -> {
+                    // skip
                 }
             }
         }
     }
 
     private fun scheduleRefreshing() {
-
         val period = TimeUnit.MINUTES.toMillis(1)
 
-        Timer(true).schedule(
-            period
-        ) {
-            runBlocking {
-                thread(name = "refreshing mangafolders", priority = 1, isDaemon = true) {
-                    refreshMangas { scheduleRefreshing() }
-                }
+        Timer(true).schedule(period) {
+            thread(name = "refreshing manga folders", priority = 1, isDaemon = true) {
+                refreshMangas { scheduleRefreshing() }
             }
         }
+    }
+
+    /**
+     * Move some where else
+     */
+    private fun scheduleGarbageCollector() {
+        val period = TimeUnit.HOURS.toMillis(1)
+        Timer(true).schedule(period) { System.gc() }
     }
 }
