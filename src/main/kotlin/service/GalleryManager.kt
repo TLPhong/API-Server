@@ -130,10 +130,10 @@ class GalleryManager private constructor() {
                         null
                     }
                 }
-
-                SyncType.DELETED, SyncType.UNCHANGED -> transaction {
+                SyncType.UNCHANGED -> transaction {
                     MangaEntity[id].toMangaFolder()
                 }
+                SyncType.DELETED -> null
             }?.also { mangaFolder ->
                 resultMangaFolders[mangaFolder.id] = mangaFolder
             }
