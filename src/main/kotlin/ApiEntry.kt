@@ -8,6 +8,7 @@ import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mu.KLogger
 import mu.KotlinLogging
@@ -93,6 +94,7 @@ fun Application.apiModule() {
                     intercept(ApplicationCallPipeline.Features) {
                         val mangaId = call.attributes[mangaIdKey]
                         val imageFileName = call.parameters["image"] ?: ""
+
                         val file = mangaFolderService.getImage(mangaId, imageFileName)
                         if (file != null) {
                             call.attributes.put(imagePathKey, file.toPath())
@@ -101,22 +103,19 @@ fun Application.apiModule() {
                             call.respond(HttpStatusCode.NotFound)
                             finish()
                         }
-                    }
-                    //Logging
-                    intercept(ApplicationCallPipeline.Monitoring) {
-                        val mangaId = call.attributes[mangaIdKey]
-                        val imageFileName = call.parameters["image"] ?: ""
 
-                        val mangaTitle: String = mangaFolderService.getTitle(mangaId)
-                        val mangaPage: Pair<Path, Page>? = mangaFolderService.getPage(mangaId, imageFileName)
-                        if (mangaPage != null) {
-                            usageLoggerService.servingPage(
-                                page = mangaPage.second,
-                                path = mangaPage.first,
-                                mangaName = mangaTitle
-                            )
-                        }else{
-                            logger.warn { "Image file [$mangaId/$imageFileName] not found" }
+                        launch {
+                            val mangaTitle: String = mangaFolderService.getTitle(mangaId)
+                            val mangaPage: Pair<Path, Page>? = mangaFolderService.getPage(mangaId, imageFileName)
+                            if (mangaPage != null) {
+                                usageLoggerService.servingPage(
+                                    page = mangaPage.second,
+                                    path = mangaPage.first,
+                                    mangaName = mangaTitle
+                                )
+                            }else{
+                                logger.warn { "Image file [$mangaId/$imageFileName] not found" }
+                            }
                         }
                     }
                     //Serve image

@@ -1,8 +1,10 @@
 package tlp.media.server.komga.logging.entity.impl
 
+import kotlinx.serialization.Serializable
 import tlp.media.server.komga.logging.entity.Resource
 
-class ResourceImpl internal constructor(
+@Serializable
+data class ResourceImpl internal constructor(
     override val name: String,
     override val galleryName: String,
     override val count: Int,
