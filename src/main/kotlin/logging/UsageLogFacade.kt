@@ -14,10 +14,12 @@ Let there be Gallery
         name
         number of Resource
 
+
 Let there be Resource
      IS: collection of Item
      PROPS:
         name
+        name of Gallery
         number of Item
         tags
         created time (epoch)
@@ -28,6 +30,7 @@ Let there be Item
     IS: static media file
     PROPS:
         name
+        name of Resource
         index
     CAN:
         be listing

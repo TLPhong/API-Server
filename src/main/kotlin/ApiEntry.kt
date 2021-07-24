@@ -17,6 +17,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
+import tlp.media.server.komga.model.Page
+import tlp.media.server.komga.service.UsageLoggingService
 import java.net.URLConnection
 import kotlin.system.measureTimeMillis
 
@@ -26,6 +28,8 @@ val PipelineContext<Unit, ApplicationCall>.logger: KLogger
 fun Application.apiModule() {
     val mangaFolderService = MangaFolderService.instance
     val imageReaderService = ImageReaderService.instance
+    val usageLoggerService = UsageLoggingService.instance
+
     routing {
 
         route("api") {
@@ -84,6 +88,7 @@ fun Application.apiModule() {
                 }
 
                 route("{image}") {
+                    //Pre-processing
                     val imagePathKey = AttributeKey<Path>("imagePath")
                     intercept(ApplicationCallPipeline.Features) {
                         val mangaId = call.attributes[mangaIdKey]
@@ -92,11 +97,29 @@ fun Application.apiModule() {
                         if (file != null) {
                             call.attributes.put(imagePathKey, file.toPath())
                         } else {
-                            logger.warn { "Image file not found [$mangaId/$imageFileName] not found" }
+                            logger.warn { "Image file [$mangaId/$imageFileName] not found" }
                             call.respond(HttpStatusCode.NotFound)
                             finish()
                         }
                     }
+                    //Logging
+                    intercept(ApplicationCallPipeline.Monitoring) {
+                        val mangaId = call.attributes[mangaIdKey]
+                        val imageFileName = call.parameters["image"] ?: ""
+
+                        val mangaTitle: String = mangaFolderService.getTitle(mangaId)
+                        val mangaPage: Pair<Path, Page>? = mangaFolderService.getPage(mangaId, imageFileName)
+                        if (mangaPage != null) {
+                            usageLoggerService.servingPage(
+                                page = mangaPage.second,
+                                path = mangaPage.first,
+                                mangaName = mangaTitle
+                            )
+                        }else{
+                            logger.warn { "Image file [$mangaId/$imageFileName] not found" }
+                        }
+                    }
+                    //Serve image
                     get {
                         val path = call.attributes.get(key = imagePathKey)
                         val time = measureTimeMillis {
@@ -106,6 +129,7 @@ fun Application.apiModule() {
                         }
                         logger.info { "Serve ${path.fileName} in [${time}millis]" }
                     }
+                    //Serve thumbnail
                     get("thumbnail") {
                         val path = call.attributes.get(key = imagePathKey)
                         val time = measureTimeMillis {
@@ -114,8 +138,9 @@ fun Application.apiModule() {
                             call.respondBytes(ContentType.parse(contentType)) { image }
                         }
                         logger.info { "Serve ${path.fileName} compressed in [${time}millis] " }
-
                     }
+                    //Post-Processing
+
                 }
 
                 /***

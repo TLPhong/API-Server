@@ -10,22 +10,23 @@ import tlp.media.server.komga.model.Page
 import java.nio.file.Path
 
 fun List<MangaFolder>.toGallery() = GalleryImpl(
-    resources = this.map { it.toResource() },
+    name = "H@H",
     count = this.size
 )
 
 fun MangaFolder.toResource(deletedTime: Long? = null): Resource = ResourceImpl(
     name = meta.title,
+    galleryName = "H@H",
     count = images.size,
     tags = meta.tags.map { it.toString() },
-    items = images.map { it.toItem() },
     createdTime = meta.downloadeTime,
     deletedTime = deletedTime
 )
 
-fun Pair<Path, Page>.toItem(): Item = ItemImpl(
+fun Pair<Path, Page>.toItem(resourceName: String): Item = ItemImpl(
     index = second.index,
-    name = first.fileName.toString()
+    name = first.fileName.toString(),
+    resourceName = resourceName
 )
 
 
