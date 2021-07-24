@@ -11,8 +11,6 @@ import java.nio.file.Path
 import java.util.concurrent.TimeUnit
 
 class ImageReaderService private constructor() {
-    private val logger = KotlinLogging.logger(ImageReaderService::class.java.simpleName)
-
     companion object {
         val instance = ImageReaderService()
     }

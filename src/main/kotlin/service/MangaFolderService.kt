@@ -1,7 +1,9 @@
 package tlp.media.server.komga.service
 
+import tlp.media.server.komga.exception.MangaNotFoundException
 import tlp.media.server.komga.model.*
 import java.io.File
+import java.nio.file.Path
 import kotlin.random.Random
 import java.util.Timer
 import java.util.concurrent.TimeUnit
@@ -23,6 +25,7 @@ class MangaFolderService private constructor() {
             }
     }
 
+    // ID to Object
     private val mangaFolders: Map<String, MangaFolder>
         get() = GalleryManager.instance.getMangaFolders()
     private var seed = Random.nextLong()
@@ -115,12 +118,15 @@ class MangaFolderService private constructor() {
         )
     }
 
-    fun getImage(mangaId: String, imageFileName: String): File? {
+    fun getPage(mangaId: String, imageFileName: String): Pair<Path, Page>? {
         return mangaFolders[mangaId]
             ?.let { mangaFolder ->
-                val pair = mangaFolder.images.find { it.first.fileName.toString() == imageFileName }
-                pair?.let { pair.first.toFile() }
+                mangaFolder.images.find { it.first.fileName.toString() == imageFileName }
             }
+    }
+
+    fun getImage(mangaId: String, imageFileName: String): File? {
+        return this.getPage(mangaId, imageFileName)?.first?.toFile()
     }
 
     fun getPages(mangaId: String): List<Page> {
@@ -156,6 +162,15 @@ class MangaFolderService private constructor() {
         }
     }
 
+
+    fun getTitle(mangaId: String): String {
+        val mangaFolder = mangaFolders[mangaId] ?: throw MangaNotFoundException(mangaId)
+        return mangaFolder.title
+    }
+
+    /**
+     * Regenerate random seed every hour
+     */
     private fun scheduleRefreshRandomSeed() {
         val period = TimeUnit.HOURS.toMillis(1)
         Timer(true)

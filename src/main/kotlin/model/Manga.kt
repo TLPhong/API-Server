@@ -26,7 +26,7 @@ data class Manga (
                 title,
                 url
             )
-            val tagsString = mangaFolder.meta.getTagString()
+            val tagsString = mangaFolder.meta.tags.joinToString(", ") { it.toString() }
             manga.genre = tagsString
 
             return manga

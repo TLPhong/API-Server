@@ -7,6 +7,7 @@ import tlp.media.server.komga.apiModule
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.service.GalleryManager
 import tlp.media.server.komga.service.MangaFolderService
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -32,7 +33,8 @@ class ImageServeTest {
 
     @AfterAll
     fun tearDown() {
-        Paths.get(DatabaseConfig.databaseFileName).toFile().delete()
+        File(Constant.databaseFileName).delete()
+        File(Constant.usageLogFileName).delete()
         testResources?.deleteGalleryDir()
     }
 

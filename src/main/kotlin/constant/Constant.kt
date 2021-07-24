@@ -26,5 +26,6 @@ object Constant {
     val baseUrl = "http://$host:$port/$baseApiPath"
     val logLevel = reader.properties.getProperty("logLevel")?: "INFO"
     val databaseFileName = reader.properties.getProperty("databaseFileName")!!
+    val usageLogFileName = reader.properties.getProperty("usageLogFilePath")!!
 }
 
