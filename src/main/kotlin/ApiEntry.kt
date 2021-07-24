@@ -139,8 +139,6 @@ fun Application.apiModule() {
                         }
                         logger.info { "Serve ${path.fileName} compressed in [${time}millis] " }
                     }
-                    //Post-Processing
-
                 }
 
                 /***
