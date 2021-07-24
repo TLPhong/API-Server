@@ -3,6 +3,7 @@ package tlp.media.server.komga.logging
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import logging.UsageLogFacade
+import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.logging.entity.Gallery
 import tlp.media.server.komga.logging.entity.Item
 import tlp.media.server.komga.logging.entity.Resource
@@ -10,7 +11,7 @@ import tlp.media.server.komga.logging.entity.impl.ItemImpl
 import java.io.File
 
 class UsageLogFacadeImpl : UsageLogFacade {
-    private val usageLogFile: File = File("usage.log")
+    private val usageLogFile: File = File(Constant.usageLogFileName)
 
     init {
         usageLogFile.createNewFile()
@@ -34,6 +35,6 @@ class UsageLogFacadeImpl : UsageLogFacade {
 
     override fun itemBeServing(item: Item) {
         val itemJson = Json.encodeToString(item as ItemImpl)
-        usageLogFile.appendText(itemJson, charset = Charsets.UTF_8)
+        usageLogFile.appendText("$itemJson\n", charset = Charsets.UTF_8)
     }
 }

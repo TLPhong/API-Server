@@ -8,8 +8,5 @@ data class ItemImpl internal constructor(
     override val name: String,
     override val resourceName: String,
     override val index: Int
-) : Item{
-    val version = "1.0"
-}
-
+) : Item
 
