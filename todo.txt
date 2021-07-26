@@ -8,7 +8,7 @@
 [x]                         Create
 [x]                         Delete
 [x]                     Optimize scanning
-[ ]        detect being use
-[ ]             Update usage into sqlite
+[x]        detect being use
+[ ]             Update usage into jsonl
 [ ]     Create prediction module
 
