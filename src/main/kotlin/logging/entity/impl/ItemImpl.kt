@@ -5,7 +5,7 @@ import tlp.media.server.komga.logging.entity.Item
 import java.text.SimpleDateFormat
 import java.util.*
 
-private val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")
+private val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSS")
 
 @Serializable
 data class ItemImpl internal constructor(
