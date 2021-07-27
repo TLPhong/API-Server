@@ -1,7 +1,6 @@
 package tlp.media.server.komga.model
 
 import java.text.SimpleDateFormat
-import java.time.format.DateTimeFormatter
 
 data class MangaInfo(
     val title: String,
@@ -15,10 +14,7 @@ data class MangaInfo(
         private val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm")
     }
 
-    val downloadeTime: Long
-    init {
-        downloadeTime = formatter.parse(downloaded).time
-    }
+    val downloadedTime: Long = formatter.parse(downloaded).time
 
     val artist: String
         get() {

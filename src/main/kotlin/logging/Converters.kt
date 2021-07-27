@@ -19,7 +19,7 @@ fun MangaFolder.toResource(deletedTime: Long? = null): Resource = ResourceImpl(
     galleryName = "H@H",
     count = images.size,
     tags = meta.tags.map { it.toString() },
-    createdTime = meta.downloadeTime,
+    createdTime = meta.downloadedTime,
     deletedTime = deletedTime
 )
 

@@ -12,6 +12,7 @@ import java.io.File
 
 class UsageLogFacadeImpl : UsageLogFacade {
     private val usageLogFile: File = File(Constant.usageLogFileName)
+    private val json = Json { encodeDefaults = true }
 
     init {
         usageLogFile.createNewFile()
@@ -34,7 +35,7 @@ class UsageLogFacadeImpl : UsageLogFacade {
     }
 
     override fun itemBeServing(item: Item) {
-        val itemJson = Json.encodeToString(item as ItemImpl)
+        val itemJson = json.encodeToString(item as ItemImpl)
         usageLogFile.appendText("$itemJson\n", charset = Charsets.UTF_8)
     }
 }
