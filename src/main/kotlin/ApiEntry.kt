@@ -82,9 +82,15 @@ fun Application.apiModule() {
                 get("pages") {
                     val id = call.attributes[mangaIdKey]
                     val pages = mangaFolderService.getPages(id)
+                    launch {
+                        val mangaTile = mangaFolderService.getTitle(id)
+                        usageLoggerService.listingPage(pages, mangaTile);
+                    }
                     call.respondText(contentType = ContentType.Application.Json) {
                         logger.info { "Listing ${pages.size} pages" }
-                        Json.encodeToString(pages)
+                        Json.encodeToString(
+                            pages.map { it.second }
+                        )
                     }
                 }
 

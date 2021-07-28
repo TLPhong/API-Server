@@ -1,5 +1,7 @@
 package tlp.media.server.komga.logging
 
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import logging.UsageLogFacade
@@ -30,12 +32,12 @@ class UsageLogFacadeImpl : UsageLogFacade {
         TODO("Not yet implemented")
     }
 
-    override fun itemsBeListing(items: List<Item>) {
-        TODO("Not yet implemented")
-    }
+    override fun itemsBeListing(items: List<Item>) = write(items)
 
-    override fun itemBeServing(item: Item) {
-        val itemJson = json.encodeToString(item as ItemImpl)
-        usageLogFile.appendText("$itemJson\n", charset = Charsets.UTF_8)
+    override fun itemBeServing(item: Item) = write(item)
+
+    private fun write(target: Any) {
+        val targetJson = json.encodeToString(target)
+        usageLogFile.appendText("$targetJson\n", charset = Charsets.UTF_8)
     }
 }

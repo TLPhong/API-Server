@@ -21,7 +21,13 @@ class UsageLoggingService {
         loggingFacade = UsageLogFacadeImpl()
     }
 
-    public fun servingPage(page: Page, path: Path, mangaName: String){
+    fun listingPage(pages: List<Pair<Path, Page>>, mangaName: String) {
+        logger.info { "Listing pages for $mangaName." }
+        val items = pages.map { it.toItem(mangaName) }
+        loggingFacade.itemsBeListing(items)
+    }
+
+    fun servingPage(page: Page, path: Path, mangaName: String){
         logger.info { "Serving item $mangaName" }
         val item = (path to page).toItem(mangaName)
         loggingFacade.itemBeServing(item)
