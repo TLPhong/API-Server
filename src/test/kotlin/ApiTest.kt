@@ -47,7 +47,7 @@ class ApiTest {
     @AfterAll
     fun tearDown() {
         File(Constant.databaseFileName).delete()
-        File(Constant.usageLogFileName).delete()
+//        File(Constant.usageLogFileName).delete()
         testResources?.deleteGalleryDir()
     }
 
