@@ -32,12 +32,17 @@ class UsageLogFacadeImpl : UsageLogFacade {
         TODO("Not yet implemented")
     }
 
-    override fun itemsBeListing(items: List<Item>) = write(items)
+    override fun itemsBeListing(items: List<Item>){
+        val targetJson = json.encodeToString(items)
+        write(targetJson)
+    }
 
-    override fun itemBeServing(item: Item) = write(item)
+    override fun itemBeServing(item: Item) {
+        val targetJson = json.encodeToString(item)
+        write(targetJson)
+    }
 
-    private fun write(target: Any) {
-        val targetJson = json.encodeToString(target)
+    private fun write(targetJson: String) {
         usageLogFile.appendText("$targetJson\n", charset = Charsets.UTF_8)
     }
 }
