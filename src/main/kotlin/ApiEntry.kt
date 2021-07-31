@@ -2,7 +2,6 @@ package tlp.media.server.komga
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.http.ContentType.Application.Json
 import io.ktor.request.*
@@ -35,38 +34,42 @@ fun Application.apiModule() {
             get("latest") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
-                val mangaFolders = mangaFolderService.getLatestMangas()
-                val mangasPage = mangaFolderService.convertToMangaPages(mangaFolders, pageNum, pageSize)
+                val pagedMangaFolders = mangaFolderService.getLatestMangas(pageNum = pageNum, pageSize = pageSize)
+                val mangasPage = mangaFolderService.convertToMangasPage(pagedMangaFolders)
                 call.respondText(contentType = Json) {
-                    logger.info { "List latest for ${mangasPage.mangas.size} mangas" }
+                    logger.info { "List latest for ${pagedMangaFolders.items.size} mangas" }
+                    @Suppress("BlockingMethodInNonBlockingContext")
                     jsonMapper.writeValueAsString(mangasPage)
                 }
-                launch { usageLoggerService.listingManga(mangaFolders) }
+                launch { usageLoggerService.listingManga(pagedMangaFolders.items) }
             }
 
             get("popular") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
-                val mangaFolders = mangaFolderService.getRandomMangaList()
-                val mangasPage = mangaFolderService.convertToMangaPages(mangaFolders, pageNum, pageSize)
+                val pagedMangaFolders = mangaFolderService.getRandomMangaList(pageNum = pageNum, pageSize = pageSize)
+                val mangasPage = mangaFolderService.convertToMangasPage(pagedMangaFolders)
                 call.respondText(contentType = Json) {
-                    logger.info { "List popular for ${mangaFolders.size} mangas" }
+                    logger.info { "List popular for ${pagedMangaFolders.items.size} mangas" }
+                    @Suppress("BlockingMethodInNonBlockingContext")
                     jsonMapper.writeValueAsString(mangasPage)
                 }
-                launch { usageLoggerService.listingManga(mangaFolders) }
+                launch { usageLoggerService.listingManga(pagedMangaFolders.items) }
             }
 
             get("search") {
                 val query = (call.request.queryParameters["query"] ?: "").toString()
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
-                val mangaFolders = mangaFolderService.queryMangaFolders(query)
-                val mangasPage = mangaFolderService.convertToMangaPages(mangaFolders, pageNum, pageSize)
+                val pagedMangaFolders =
+                    mangaFolderService.queryMangaFolders(query, pageSize = pageSize, pageNum = pageNum)
+                val mangasPage = mangaFolderService.convertToMangasPage(pagedMangaFolders)
                 call.respondText(contentType = Json) {
-                    logger.info { "Query [$query] result, serve ${mangaFolders.size} mangas" }
+                    logger.info { "Query [$query] result, serve ${pagedMangaFolders.items.size} mangas" }
+                    @Suppress("BlockingMethodInNonBlockingContext")
                     jsonMapper.writeValueAsString(mangasPage)
                 }
-                launch { usageLoggerService.listingManga(mangaFolders) }
+                launch { usageLoggerService.listingManga(pagedMangaFolders.items) }
             }
             // MangaDetail
             route("manga/{id}") {
@@ -76,6 +79,7 @@ fun Application.apiModule() {
                     val manga = mangaFolderService.getManga(mangaId)
                     call.respondText(contentType = Json) {
                         logger.info { "Serve ${manga.manga.title}" }
+                        @Suppress("BlockingMethodInNonBlockingContext")
                         jsonMapper.writeValueAsString(manga)
                     }
                 }
@@ -85,6 +89,7 @@ fun Application.apiModule() {
                     val pages = mangaFolderService.getPages(id)
                     call.respondText(contentType = Json) {
                         logger.info { "Listing ${pages.size} pages" }
+                        @Suppress("BlockingMethodInNonBlockingContext")
                         jsonMapper.writeValueAsString(
                             pages.map { it.second }
                         )
@@ -120,7 +125,7 @@ fun Application.apiModule() {
                                     path = mangaPage.first,
                                     mangaName = mangaTitle
                                 )
-                            }else{
+                            } else {
                                 logger.warn { "Image file [$mangaId/$imageFileName] not found" }
                             }
                         }

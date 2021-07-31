@@ -1,5 +1,6 @@
 package tlp.media.server.komga.service
 
+import com.sun.org.apache.xpath.internal.operations.Bool
 import tlp.media.server.komga.exception.MangaNotFoundException
 import tlp.media.server.komga.model.*
 import java.io.File
@@ -35,8 +36,8 @@ class MangaFolderService private constructor() {
         scheduleRefreshRandomSeed()
     }
 
-    fun queryMangaFolders(query: String): List<MangaFolder> {
-        return mangaFolders
+    fun queryMangaFolders(query: String, pageNum: Int, pageSize: Int): Paged<MangaFolder> {
+        val queriedMangaFolder = mangaFolders
             .map { entry ->
                 val mangaFolder = entry.value
                 val tags = mangaFolder.meta.tags.map { it.toString() }
@@ -66,19 +67,21 @@ class MangaFolderService private constructor() {
             .filter { (_, matchScore) -> matchScore > 0 }
             .sortedByDescending { (_, matchScore) -> matchScore }
             .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
+        return Paged.fromAll(queriedMangaFolder, pageIndex = pageNum - 1, pageSize = pageSize)
     }
 
-    fun getRandomMangaList(): List<MangaFolder> {
-        return mangaFolders
+    fun getRandomMangaList(pageNum: Int, pageSize: Int): Paged<MangaFolder> {
+        val randomizedList = mangaFolders
             .map { it.value }
             .shuffled(Random(seed))
-
+        return Paged.fromAll(randomizedList, pageIndex = pageNum - 1, pageSize = pageSize)
     }
 
-    fun getLatestMangas(): List<MangaFolder> {
-        return mangaFolders
+    fun getLatestMangas(pageNum: Int, pageSize: Int): Paged<MangaFolder> {
+        val latestList = mangaFolders
             .map { it.value }
             .sortedByDescending { it.meta.downloaded }
+        return Paged.fromAll(latestList, pageIndex = pageNum - 1, pageSize = pageSize)
     }
 
 
@@ -110,30 +113,18 @@ class MangaFolderService private constructor() {
         return mangaFolders.containsKey(key)
     }
 
-    fun convertToMangaPages(mangas: List<MangaFolder>, pageNum: Int, pageSize: Int): MangasPage {
-        val chunked = mangas.chunked(pageSize)
-
-        return if (chunked.isNotEmpty()) {
-            val chunkIndex = pageNum - 1
-            val mangaList = chunked[chunkIndex].map {
-                MangaWithChapter(
-                    manga = Manga.fromMangaFolder(it),
-                    chapter = it.chapter
-                )
-            }
-            val hasNext = chunked.size > chunkIndex + 1
-            MangasPage(
-                mangas = mangaList,
-                hasNext
-            )
-        } else {
-            MangasPage(
-                mangas = emptyList(),
-                hasNextPage = false
+    fun convertToMangasPage(mangaFolderPaged: Paged<MangaFolder>): MangasPage {
+        val mangaList = mangaFolderPaged.items.map {
+            MangaWithChapter(
+                manga = Manga.fromMangaFolder(it),
+                chapter = it.chapter
             )
         }
+        return MangasPage(
+            mangas = mangaList,
+            hasNextPage = mangaFolderPaged.hasNext
+        )
     }
-
 
     fun getTitle(mangaId: String): String {
         val mangaFolder = mangaFolders[mangaId] ?: throw MangaNotFoundException(mangaId)
