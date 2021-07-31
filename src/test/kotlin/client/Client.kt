@@ -15,11 +15,11 @@ class TachiyomiClient : HttpSource() {
 
 
     override fun popularMangaRequest(page: Int): Request {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun searchMangaRequest(page: Int, query: String, filters: FilterList): Request {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun latestUpdatesRequest(page: Int): Request {
@@ -33,26 +33,26 @@ class TachiyomiClient : HttpSource() {
     }
 
     override fun popularMangaParse(response: Response): MangasPage {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun searchMangaParse(response: Response): MangasPage {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun imageUrlParse(response: Response): String {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun mangaDetailsParse(response: Response): SManga {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun chapterListParse(response: Response): List<SChapter> {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 
     override fun pageListParse(response: Response): List<Page> {
-        TODO("Not yet implemented")
+        throw NotImplementedError()
     }
 }
