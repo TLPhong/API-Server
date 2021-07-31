@@ -14,7 +14,6 @@ import tlp.media.server.komga.model.MangaWithChapter
 import tlp.media.server.komga.model.MangasPage
 import tlp.media.server.komga.service.GalleryManager
 import java.io.File
-import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -50,6 +49,11 @@ class ApiTest {
         File(Constant.usageLogFileName).delete()
         testResources?.deleteGalleryDir()
         testResources?.deleteGalleryDir()
+        testResources?.deleteGalleryDir()
+    }
+
+    private fun assertJsonContentType(response: TestApplicationResponse) {
+        assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
     }
 
 
@@ -70,11 +74,12 @@ class ApiTest {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/latest?page=1")) {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
+                assertJsonContentType(response)
             }
         }
     }
+
 
     @Test
     @DisplayName("Latest API can parse")
@@ -115,8 +120,8 @@ class ApiTest {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415")) {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
+                assertJsonContentType(response)
             }
         }
     }
@@ -171,8 +176,8 @@ class ApiTest {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415/pages")) {
                 assertEquals(HttpStatusCode.OK, response.status())
-                assertEquals("application/json; charset=UTF-8", response.headers["content-type"])
                 assertFalse(response.content.isNullOrEmpty())
+                assertJsonContentType(response)
             }
         }
     }
