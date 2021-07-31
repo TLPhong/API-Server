@@ -39,7 +39,7 @@ class PersistenceTest {
 
     @Test
     @DisplayName("Manga count correct")
-    fun test_manga_count() {
+    fun testMangaCount() {
         val actualCount = transaction { MangaEntity.count() }
         assertEquals(2, actualCount)
     }
@@ -47,21 +47,21 @@ class PersistenceTest {
 
     @Test
     @DisplayName("Tag count correct")
-    fun test_tag_count() {
+    fun testTagCount() {
         val actualCount = transaction { TagEntity.count() }
         assertEquals(4, actualCount)
     }
 
     @Test
     @DisplayName("Image count correct")
-    fun test_image_count() {
+    fun testImageCount() {
         val actualCount = transaction { ImageEntity.count() }
         assertEquals(26, actualCount)
     }
 
     @Test
     @DisplayName("Mapping count correct")
-    fun test_mapping_count() {
+    fun testMappingCount() {
         val secondManga = transaction { MangaEntity["1861415"] }
         val imagesCount = transaction { secondManga.images.count() }
         val tagsCount = transaction { secondManga.tags.count() }

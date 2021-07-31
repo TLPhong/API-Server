@@ -29,7 +29,7 @@ class MangaFolderMetaParserTest {
 
     @Test
     @DisplayName("Test parser not crash")
-    fun test_parser_not_crash() {
+    fun testParserNotCrash() {
         val pathString =
             """test_gallery/[White Island (Mashima Saki)] Fate colors V (FateGrand Order) [1861415]/galleryinfo.txt"""
         val galleryMetaPath = Paths.get(pathString)

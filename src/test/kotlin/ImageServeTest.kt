@@ -43,7 +43,7 @@ class ImageServeTest {
 
     @Test
     @DisplayName("Serve image, check status only")
-    fun  test_serve_1_image_status_ok(){
+    fun  testServe1ImageStatusOk(){
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "${Constant.baseApiPath}/$testImage")) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -54,7 +54,7 @@ class ImageServeTest {
 
     @Test
     @DisplayName("Serve image")
-    fun  test_serve_1_image(){
+    fun  testServe1Image(){
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "${Constant.baseApiPath}/$testImage")) {
                val content = this.response.byteContent!!
@@ -65,7 +65,7 @@ class ImageServeTest {
 
     @Test
     @DisplayName("Serve image resized")
-    fun  test_serve_image_resized(){
+    fun  testServeImageResized(){
         var originImageSize: Int = -1
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "${Constant.baseApiPath}/$testImage")) {
