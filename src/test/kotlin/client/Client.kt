@@ -9,7 +9,7 @@ class TachiyomiClient : HttpSource() {
     override val lang: String = "en"
     override val supportsLatest: Boolean = true
     override val name: String = "TLP"
-    override val baseUrl: String = "http://192.168.86.3:8081/api"
+    override val baseUrl: String = "random shjt here"
     private val requests = TlpRequests()
     private val parser = TlpResponseUtil()
 
