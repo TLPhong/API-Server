@@ -8,12 +8,12 @@ import tlp.media.server.komga.logging.entity.impl.ItemImpl
 import tlp.media.server.komga.logging.entity.impl.ResourceImpl
 import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
+import tlp.media.server.komga.service.GalleryManager
 import java.nio.file.Path
 
-fun List<MangaFolder>.toGallery(action: Action) = GalleryImpl(
+fun GalleryManager.toGallery() = GalleryImpl(
     name = "H@H",
-    count = this.size,
-    action = action
+    count = this.getMangaFolders().values.size
 )
 
 fun MangaFolder.toResource(action: Action): Resource = ResourceImpl(

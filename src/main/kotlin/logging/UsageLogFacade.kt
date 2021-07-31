@@ -7,9 +7,6 @@ import tlp.media.server.komga.logging.entity.Resource
 /*
 Let there be Gallery
     IS: Collection of Resource
-    CAN:
-        add Resource
-        remove Resource
     PROPS:
         name
         number of Resource
@@ -24,7 +21,10 @@ Let there be Resource
         tags
         created time (epoch)
         deleted time (epoch)
-     CAN: be listing
+     CAN:
+        be listing
+        be removed from Gallery
+        be added to Gallery
 
 Let there be Item
     IS: static media file
@@ -37,8 +37,8 @@ Let there be Item
         be serving
  */
 interface UsageLogFacade {
-    fun galleryAddResource(gallery: Gallery, resource: Resource)
-    fun galleryRemoveResource(gallery: Gallery, resource: Resource)
+    // Removed or Created
+    fun resourceChanged(resource: Resource)
     fun resourcesBeListing(resource: List<Resource>)
     fun itemsBeListing(items: List<Item>)
     fun itemBeServing(item: Item)
