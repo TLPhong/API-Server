@@ -6,32 +6,41 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class MangaFolderMetaParser(metaFile: Path) {
-    val allLines: List<String> = Files.readAllLines(metaFile)
+    private val allLines: List<String> = Files.readAllLines(metaFile)
 
     fun parse(): MangaInfo {
         val sections = mapToSection()
         return sectionsToGalleryInfo(sections)
     }
 
+    private object MetaProps{
+        val title = "Title"
+        val uploadTime = "Upload Time"
+        val uploadedBy = "Uploaded By"
+        val downloaded = "Downloaded"
+        val tags = "Tags"
+        val uploaderComments = "Uploader's Comments"
+    }
+
     private fun sectionsToGalleryInfo(sections: Map<String, String>): MangaInfo {
         return MangaInfo(
-            title = sections["Title"] ?: "",
-            uploadTime = sections["Upload Time"] ?: "",
-            uploadBy = sections["Uploaded By"] ?: "",
-            downloaded = sections["Downloaded"] ?: "",
-            tags = parseTags(sections["Tags"] ?: ""),
-            description = sections["Uploader's Comments"] ?: ""
+            title = sections[MetaProps.title] ?: "",
+            uploadTime = sections[MetaProps.uploadTime] ?: "",
+            uploadBy = sections[MetaProps.uploadedBy] ?: "",
+            downloaded = sections[MetaProps.downloaded] ?: "",
+            tags = parseTags(sections[MetaProps.tags] ?: ""),
+            description = sections[MetaProps.uploaderComments] ?: ""
         )
     }
 
     private fun mapToSection(): Map<String, String> {
         val contentMap = mutableMapOf(
-            "Title" to "",
-            "Upload Time" to "",
-            "Uploaded By" to "",
-            "Downloaded" to "",
-            "Tags" to "",
-            "Uploader's Comments" to ""
+            MetaProps.title to "",
+            MetaProps.uploadTime to "",
+            MetaProps.uploadedBy to "",
+            MetaProps.downloaded to "",
+            MetaProps.tags to "",
+            MetaProps.uploaderComments to ""
         )
 
         allLines
