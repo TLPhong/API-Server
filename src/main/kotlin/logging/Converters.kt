@@ -16,13 +16,12 @@ fun List<MangaFolder>.toGallery(action: Action) = GalleryImpl(
     action = action
 )
 
-fun MangaFolder.toResource(deletedTime: Long? = null, action: Action): Resource = ResourceImpl(
+fun MangaFolder.toResource(action: Action): Resource = ResourceImpl(
     name = meta.title,
     galleryName = "H@H",
     count = images.size,
     tags = meta.tags.map { it.toString() },
     createdTime = meta.downloadedTime,
-    deletedTime = deletedTime,
     action = action
 )
 

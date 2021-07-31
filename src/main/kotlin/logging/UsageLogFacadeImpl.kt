@@ -24,8 +24,11 @@ class UsageLogFacadeImpl : UsageLogFacade {
         TODO("Not yet implemented")
     }
 
-    override fun resourcesBeListing(resource: List<Resource>) {
-        TODO("Not yet implemented")
+    override fun resourcesBeListing(resources: List<Resource>) {
+        val targetJson = resources.joinToString(separator = "\n") {
+            jsonMapper.writeValueAsString(it)
+        }
+        write(targetJson);
     }
 
     override fun itemsBeListing(items: List<Item>){

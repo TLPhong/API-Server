@@ -9,6 +9,5 @@ data class ResourceImpl internal constructor(
     override val count: Int,
     override val tags: List<String>,
     override val createdTime: Long,
-    override val deletedTime: Long?,
     override val action: Action
 ) : Resource, LoggingMetaImpl(version = 0.1f)
