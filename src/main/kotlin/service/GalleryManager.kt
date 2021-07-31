@@ -23,13 +23,12 @@ import kotlin.concurrent.schedule;
 
 /***
  * Service that handle parsing/recurring parsing
- * TODO: Rename to resolving
  * ====
  * When app init:
  *      call initialize (sync)
  *          -> update mangaFolder list (sync)
  *          sync to db (mangaFolder list) (async)
- * Every 5 mins after first: (async)
+ * Every 5 minutes after first: (async)
  *      -> update mangaFolder list (sync)
  *      -> sync to db (sync)
  */
@@ -83,7 +82,7 @@ class GalleryManager private constructor() {
         .list(galleryFolderPath)
         .asSequence()
         .filterNotNull()
-        .mapNotNull { MangaFolderParser(it) }
+        .map { MangaFolderParser(it) }
 
     private fun loadIdListFromDb(): List<String> = transaction {
         MangaTable.slice(MangaTable.id).selectAll().map { it[MangaTable.id].value }
