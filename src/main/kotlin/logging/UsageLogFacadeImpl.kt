@@ -3,7 +3,6 @@ package tlp.media.server.komga.logging
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import logging.UsageLogFacade
 import tlp.media.server.komga.constant.Constant
-import tlp.media.server.komga.logging.entity.Gallery
 import tlp.media.server.komga.logging.entity.Item
 import tlp.media.server.komga.logging.entity.Resource
 import java.io.File
@@ -16,22 +15,19 @@ class UsageLogFacadeImpl : UsageLogFacade {
         usageLogFile.createNewFile()
     }
 
-    override fun galleryAddResource(gallery: Gallery, resource: Resource) {
-        TODO("Not yet implemented")
+    override fun resourceChanged(resource: Resource) {
+        val targetJson = jsonMapper.writeValueAsString(resource)
+        write(targetJson)
     }
 
-    override fun galleryRemoveResource(gallery: Gallery, resource: Resource) {
-        TODO("Not yet implemented")
-    }
-
-    override fun resourcesBeListing(resources: List<Resource>) {
-        val targetJson = resources.joinToString(separator = "\n") {
+    override fun resourcesBeListing(resource: List<Resource>) {
+        val targetJson = resource.joinToString(separator = "\n") {
             jsonMapper.writeValueAsString(it)
         }
-        write(targetJson);
+        write(targetJson)
     }
 
-    override fun itemsBeListing(items: List<Item>){
+    override fun itemsBeListing(items: List<Item>) {
         val targetJson = items.joinToString(separator = "\n") {
             jsonMapper.writeValueAsString(it)
         }

@@ -4,6 +4,9 @@ import logging.UsageLogFacade
 import mu.KotlinLogging
 import tlp.media.server.komga.logging.UsageLogFacadeImpl
 import tlp.media.server.komga.logging.entity.Action
+import tlp.media.server.komga.logging.entity.impl.GalleryImpl
+import tlp.media.server.komga.logging.entity.impl.ResourceImpl
+import tlp.media.server.komga.logging.toGallery
 import tlp.media.server.komga.logging.toItem
 import tlp.media.server.komga.logging.toResource
 import tlp.media.server.komga.model.MangaFolder
@@ -21,6 +24,17 @@ class UsageLoggingService {
     private val loggingFacade: UsageLogFacade
     init {
         loggingFacade = UsageLogFacadeImpl()
+    }
+
+
+    fun removeResource(targetMangaFolder: MangaFolder) {
+        val resource = targetMangaFolder.toResource(action = Action.RESOURCE_REMOVE)
+        loggingFacade.resourceChanged(resource)
+    }
+
+    fun addResource(targetMangaFolder: MangaFolder) {
+        val resource = targetMangaFolder.toResource(action = Action.RESOURCE_ADD)
+        loggingFacade.resourceChanged(resource)
     }
 
     fun listingManga(mangas: List<MangaFolder>){
