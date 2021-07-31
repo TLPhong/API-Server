@@ -30,7 +30,7 @@ class GalleryMangaFolderParserTest {
 
     @Test
     @DisplayName("Smoke test whole folder parser")
-    fun test_whole_folder_parse_not_crash() {
+    fun testWholeFolderParseNotCrash() {
         GalleryFolderParser(workingDir).parse()
     }
 }

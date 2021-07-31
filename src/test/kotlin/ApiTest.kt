@@ -55,7 +55,7 @@ class ApiTest {
     @DisplayName("Create latest request")
     @ParameterizedTest
     @ValueSource(ints = [1, 2, 10, 100])
-    fun test_create_latest_request(input: Int) {
+    fun testCreateLatestRequest(input: Int) {
         val pageSize = 60
         val expectedURL = "$baseURL/latest?page=$input&size=$pageSize"
         val request = requests.latestMangas(input, pageSize)
@@ -65,7 +65,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Latest API call return OK")
-    fun test_latest_api_call_ok() {
+    fun testLatestApiCallOk() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/latest?page=1")) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -77,7 +77,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Latest API can parse")
-    fun test_latest_api_call_can_parse() {
+    fun testLatestApiCallCanParse() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/latest?page=1")) {
                 val content = response.content!!
@@ -90,7 +90,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Test paging correct")
-    fun test_latest_api_call_paging_correct() {
+    fun testLatestApiCallPagingCorrect() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/latest?page=1&size=10")) {
                 val content = response.content!!
@@ -110,7 +110,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Manga API call return OK")
-    fun test_manga_api_call_ok() {
+    fun testMangaApiCallOk() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415")) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -122,7 +122,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Manga API can parse")
-    fun test_manga_api_can_parse() {
+    fun testMangaApiCanParse() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415")) {
                 val content = response.content!!
@@ -134,7 +134,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Get image call return OK")
-    fun test_image_api_call_ok() {
+    fun testImageApiCallOk() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415/7_8.png")) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -148,7 +148,7 @@ class ApiTest {
     @ParameterizedTest
     @ValueSource(ints = [5, 15, 9999])
     @DisplayName("Client util test OK")
-    fun test_latest_api_call_client_parser(input: Int) {
+    fun testLatestApiCallClientParser(input: Int) {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/latest?page=1&size=$input")) {
                 val content = response.content!!
@@ -166,7 +166,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Page list API call return OK")
-    fun test_page_list_call_ok() {
+    fun testPageListCallOk() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415/pages")) {
                 assertEquals(HttpStatusCode.OK, response.status())
@@ -178,7 +178,7 @@ class ApiTest {
 
     @Test
     @DisplayName("Page list API can parse")
-    fun test_page_list_call_parse() {
+    fun testPageListCallParse() {
         withTestApplication(Application::apiModule) {
             with(handleRequest(HttpMethod.Get, "api/manga/1861415/pages")) {
                 val content = response.content!!

@@ -30,7 +30,7 @@ class MangaFolderParserTest {
 
     @Test
     @DisplayName("Test folder parser")
-    fun test_folder_parser_basic() {
+    fun testFolderParserBasic() {
         val pathString =
             """${Constant.galleryPath}/[White Island (Mashima Saki)] Fate colors V (FateGrand Order) [1861415]"""
         val expectedDescription = """(C98) [White Island (マシマサキ)] Fate colors V (FateGrand Order)
