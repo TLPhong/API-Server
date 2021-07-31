@@ -9,6 +9,7 @@ import tlp.media.server.komga.constant.Constant
 
 private fun configure() {
     DatabaseConfig.initialize(logLevel = Level.toLevel(Constant.logLevel))
+
 }
 
 fun main() {

@@ -1,26 +1,25 @@
 package tlp.media.server.komga
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.ktor.application.*
 import io.ktor.http.*
+import io.ktor.http.ContentType.Application.Json
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
-import kotlinx.coroutines.async
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import mu.KLogger
 import mu.KotlinLogging
+import tlp.media.server.komga.model.Page
 import tlp.media.server.komga.service.ImageReaderService
 import tlp.media.server.komga.service.MangaFolderService
-import java.nio.file.Files
-import java.nio.file.Path
-import kotlinx.serialization.*
-import kotlinx.serialization.json.*
-import tlp.media.server.komga.model.Page
 import tlp.media.server.komga.service.UsageLoggingService
 import java.net.URLConnection
+import java.nio.file.Path
 import kotlin.system.measureTimeMillis
 
 val PipelineContext<Unit, ApplicationCall>.logger: KLogger
@@ -30,6 +29,7 @@ fun Application.apiModule() {
     val mangaFolderService = MangaFolderService.instance
     val imageReaderService = ImageReaderService.instance
     val usageLoggerService = UsageLoggingService.instance
+    val jsonMapper = jacksonObjectMapper()
 
     routing {
 
@@ -38,20 +38,20 @@ fun Application.apiModule() {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.getLatestMangas(pageNum, pageSize)
-                call.respondText(contentType = ContentType.Application.Json) {
+                call.respondText(contentType = Json) {
                     logger.info { "List latest for ${mangas.mangas.size} mangas" }
-                    Json.encodeToString(mangas)
+                    jsonMapper.writeValueAsString(mangas)
                 }
             }
 
             get("popular") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
-                //TODO popular mangas
+                //TODO: popular mangas
                 val mangas = mangaFolderService.getRandomMangaList(pageNum, pageSize)
-                call.respondText(contentType = ContentType.Application.Json) {
+                call.respondText(contentType = Json) {
                     logger.info { "List popular for ${mangas.mangas.size} mangas" }
-                    Json.encodeToString(mangas)
+                    jsonMapper.writeValueAsString(mangas)
                 }
             }
 
@@ -60,9 +60,9 @@ fun Application.apiModule() {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
                 val mangas = mangaFolderService.searchManga(query, pageNum, pageSize)
-                call.respondText(contentType = ContentType.Application.Json) {
+                call.respondText(contentType = Json) {
                     logger.info { "Query [$query] result, serve ${mangas.mangas.size} mangas" }
-                    Json.encodeToString(mangas)
+                    jsonMapper.writeValueAsString(mangas)
                 }
             }
             // MangaDetail
@@ -73,18 +73,24 @@ fun Application.apiModule() {
                     val mangaId = call.attributes[mangaIdKey]
                     val manga = mangaFolderService.getManga(mangaId)
 
-                    call.respondText(contentType = ContentType.Application.Json) {
+                    call.respondText(contentType = Json) {
                         logger.info { "Serve ${manga.manga.title}" }
-                        Json.encodeToString(manga)
+                        jsonMapper.writeValueAsString(manga)
                     }
                 }
 
                 get("pages") {
                     val id = call.attributes[mangaIdKey]
                     val pages = mangaFolderService.getPages(id)
-                    call.respondText(contentType = ContentType.Application.Json) {
+                    launch {
+                        val mangaTile = mangaFolderService.getTitle(id)
+                        usageLoggerService.listingPage(pages, mangaTile);
+                    }
+                    call.respondText(contentType = Json) {
                         logger.info { "Listing ${pages.size} pages" }
-                        Json.encodeToString(pages)
+                        jsonMapper.writeValueAsString(
+                            pages.map { it.second }
+                        )
                     }
                 }
 
