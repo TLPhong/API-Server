@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import tlp.media.server.komga.logging.UsageLogFacadeImpl
 import tlp.media.server.komga.logging.entity.Action
 import tlp.media.server.komga.logging.toItem
+import tlp.media.server.komga.logging.toResource
 import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
 import java.nio.file.Path
@@ -22,15 +23,21 @@ class UsageLoggingService {
         loggingFacade = UsageLogFacadeImpl()
     }
 
+    fun listingManga(mangas: List<MangaFolder>){
+        logger.info { "Listing ${mangas.size} mangas." }
+        val resources = mangas.map { it.toResource(action = Action.RESOURCE_LIST) }
+        loggingFacade.resourcesBeListing(resources)
+    }
+
     fun listingPage(pages: List<Pair<Path, Page>>, mangaName: String) {
         logger.info { "Listing pages for $mangaName." }
-        val items = pages.map { it.toItem(mangaName, Action.ITEM_LIST) }
+        val items = pages.map { it.toItem(mangaName,action = Action.ITEM_LIST) }
         loggingFacade.itemsBeListing(items)
     }
 
     fun servingPage(page: Page, path: Path, mangaName: String){
-        logger.info { "Serving item $mangaName" }
-        val item = (path to page).toItem(mangaName, Action.ITEM_SERVE)
+        logger.info { "Serving item $mangaName." }
+        val item = (path to page).toItem(mangaName,action = Action.ITEM_SERVE)
         loggingFacade.itemBeServing(item)
     }
 

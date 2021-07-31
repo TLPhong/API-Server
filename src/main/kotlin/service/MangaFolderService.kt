@@ -35,32 +35,7 @@ class MangaFolderService private constructor() {
         scheduleRefreshRandomSeed()
     }
 
-    fun searchManga(query: String, pageNum: Int, pageSize: Int = 20): MangasPage {
-        val chunked = queryMangaFolders(query)
-            .chunked(pageSize)
-
-        if (chunked.isNullOrEmpty()) {
-            return MangasPage(
-                mangas = emptyList(),
-                hasNextPage = true
-            )
-        }
-
-        val mangaList = chunked[pageNum - 1].map {
-            MangaWithChapter(
-                manga = Manga.fromMangaFolder(it),
-                chapter = it.chapter
-            )
-        }
-        val hasNext: Boolean = chunked.size > pageNum + 1
-
-        return MangasPage(
-            mangas = mangaList,
-            hasNext
-        )
-    }
-
-    private fun queryMangaFolders(query: String): List<MangaFolder> {
+    fun queryMangaFolders(query: String): List<MangaFolder> {
         return mangaFolders
             .map { entry ->
                 val mangaFolder = entry.value
@@ -93,20 +68,17 @@ class MangaFolderService private constructor() {
             .map { (mangaFoldersEntry, _) -> mangaFoldersEntry.value }
     }
 
-    fun getRandomMangaList(pageNum: Int, pageSize: Int = 20): MangasPage {
-        val mangas = mangaFolders
+    fun getRandomMangaList(): List<MangaFolder> {
+        return mangaFolders
             .map { it.value }
             .shuffled(Random(seed))
 
-        return getPagedMangasPage(mangas, pageNum, pageSize)
     }
 
-    fun getLatestMangas(pageNum: Int, pageSize: Int = 20): MangasPage {
-        val mangas = mangaFolders
+    fun getLatestMangas(): List<MangaFolder> {
+        return mangaFolders
             .map { it.value }
             .sortedByDescending { it.meta.downloaded }
-
-        return getPagedMangasPage(mangas, pageNum, pageSize)
     }
 
 
@@ -138,7 +110,7 @@ class MangaFolderService private constructor() {
         return mangaFolders.containsKey(key)
     }
 
-    private fun getPagedMangasPage(mangas: List<MangaFolder>, pageNum: Int, pageSize: Int): MangasPage {
+    fun convertToMangaPages(mangas: List<MangaFolder>, pageNum: Int, pageSize: Int): MangasPage {
         val chunked = mangas.chunked(pageSize)
 
         return if (chunked.isNotEmpty()) {

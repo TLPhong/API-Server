@@ -6,5 +6,4 @@ interface Resource {
     val count: Int
     val tags: List<String>
     val createdTime: Long
-    val deletedTime: Long?
 }

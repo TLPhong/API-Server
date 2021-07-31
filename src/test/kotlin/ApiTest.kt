@@ -48,8 +48,6 @@ class ApiTest {
         File(Constant.databaseFileName).delete()
         File(Constant.usageLogFileName).delete()
         testResources?.deleteGalleryDir()
-        testResources?.deleteGalleryDir()
-        testResources?.deleteGalleryDir()
     }
 
     private fun assertJsonContentType(response: TestApplicationResponse) {
