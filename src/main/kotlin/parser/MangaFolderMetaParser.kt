@@ -6,7 +6,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 class MangaFolderMetaParser(metaFile: Path) {
-    val allLines: List<String> = Files.readAllLines(metaFile)
+    private val allLines: List<String> = Files.readAllLines(metaFile)
 
     fun parse(): MangaInfo {
         val sections = mapToSection()
