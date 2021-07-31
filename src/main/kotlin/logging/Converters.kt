@@ -1,5 +1,6 @@
 package tlp.media.server.komga.logging
 
+import tlp.media.server.komga.logging.entity.Action
 import tlp.media.server.komga.logging.entity.Item
 import tlp.media.server.komga.logging.entity.Resource
 import tlp.media.server.komga.logging.entity.impl.GalleryImpl
@@ -9,24 +10,27 @@ import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
 import java.nio.file.Path
 
-fun List<MangaFolder>.toGallery() = GalleryImpl(
+fun List<MangaFolder>.toGallery(action: Action) = GalleryImpl(
     name = "H@H",
-    count = this.size
+    count = this.size,
+    action = action
 )
 
-fun MangaFolder.toResource(deletedTime: Long? = null): Resource = ResourceImpl(
+fun MangaFolder.toResource(deletedTime: Long? = null, action: Action): Resource = ResourceImpl(
     name = meta.title,
     galleryName = "H@H",
     count = images.size,
     tags = meta.tags.map { it.toString() },
     createdTime = meta.downloadedTime,
-    deletedTime = deletedTime
+    deletedTime = deletedTime,
+    action = action
 )
 
-fun Pair<Path, Page>.toItem(resourceName: String): Item = ItemImpl(
+fun Pair<Path, Page>.toItem(resourceName: String, action: Action): Item = ItemImpl(
     index = second.index,
     name = first.fileName.toString(),
-    resourceName = resourceName
+    resourceName = resourceName,
+    action = action
 )
 
 

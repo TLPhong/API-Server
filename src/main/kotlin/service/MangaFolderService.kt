@@ -129,9 +129,9 @@ class MangaFolderService private constructor() {
         return this.getPage(mangaId, imageFileName)?.first?.toFile()
     }
 
-    fun getPages(mangaId: String): List<Page> {
+    fun getPages(mangaId: String): List<Pair<Path, Page>> {
         val mangaFolder = mangaFolders[mangaId] ?: error("Manga ID $mangaId not found")
-        return mangaFolder.images.map { it.second }.toList()
+        return mangaFolder.images
     }
 
     fun containsKey(key: String): Boolean {

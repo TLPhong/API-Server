@@ -1,10 +1,7 @@
 package tlp.media.server.komga.model
 
 import eu.kanade.tachiyomi.source.model.SChapter
-import kotlinx.serialization.Serializable
 
-
-@Serializable
 class Chapter(
     override var date_upload: Long,
     override var name: String,

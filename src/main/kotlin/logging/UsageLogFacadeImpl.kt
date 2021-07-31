@@ -1,18 +1,16 @@
 package tlp.media.server.komga.logging
 
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import logging.UsageLogFacade
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.logging.entity.Gallery
 import tlp.media.server.komga.logging.entity.Item
 import tlp.media.server.komga.logging.entity.Resource
-import tlp.media.server.komga.logging.entity.impl.ItemImpl
 import java.io.File
 
 class UsageLogFacadeImpl : UsageLogFacade {
     private val usageLogFile: File = File(Constant.usageLogFileName)
-    private val json = Json { encodeDefaults = true }
+    private val jsonMapper = jacksonObjectMapper()
 
     init {
         usageLogFile.createNewFile()
@@ -30,12 +28,19 @@ class UsageLogFacadeImpl : UsageLogFacade {
         TODO("Not yet implemented")
     }
 
-    override fun itemsBeListing(items: List<Item>) {
-        TODO("Not yet implemented")
+    override fun itemsBeListing(items: List<Item>){
+        val targetJson = items.joinToString(separator = "\n") {
+            jsonMapper.writeValueAsString(it)
+        }
+        write(targetJson)
     }
 
     override fun itemBeServing(item: Item) {
-        val itemJson = json.encodeToString(item as ItemImpl)
-        usageLogFile.appendText("$itemJson\n", charset = Charsets.UTF_8)
+        val targetJson = jsonMapper.writeValueAsString(item)
+        write(targetJson)
+    }
+
+    private fun write(targetJson: String) {
+        usageLogFile.appendText("$targetJson\n", charset = Charsets.UTF_8)
     }
 }
