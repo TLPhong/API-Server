@@ -16,7 +16,6 @@ fun MangaFolder.toMangaEntity(): MangaEntity {
         if (mangaEntity != null) return mangaEntity
     }
 
-    //TODO: Performance improvement point
     val tagEntities = mangaFolder.meta.tags.toTagEntities()
     val mangaEntity = transaction {
         MangaEntity.findById(mangaFolder.id) ?: MangaEntity.new(mangaFolder.id) {

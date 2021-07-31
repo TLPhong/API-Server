@@ -47,7 +47,6 @@ fun Application.apiModule() {
             get("popular") {
                 val pageNum = (call.request.queryParameters["page"] ?: "1").toInt()
                 val pageSize = (call.request.queryParameters["size"] ?: "20").toInt()
-                //TODO: popular mangas
                 val mangaFolders = mangaFolderService.getRandomMangaList()
                 val mangasPage = mangaFolderService.convertToMangaPages(mangaFolders, pageNum, pageSize)
                 call.respondText(contentType = Json) {
@@ -92,7 +91,7 @@ fun Application.apiModule() {
                     }
                     launch {
                         val mangaTile = mangaFolderService.getTitle(id)
-                        usageLoggerService.listingPage(pages, mangaTile);
+                        usageLoggerService.listingPage(pages, mangaTile)
                     }
                 }
 
