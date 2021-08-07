@@ -172,7 +172,14 @@ fun Application.apiModule() {
                 }
             }
         }
+        healthCheckRoute()
+    }
+}
 
-
+private fun Routing.healthCheckRoute(): Route {
+    return route("arYouAlive"){
+        get {
+            call.respondText(ContentType.Text.Plain){ "yea" }
+        }
     }
 }
