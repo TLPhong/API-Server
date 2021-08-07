@@ -172,7 +172,7 @@ fun Application.apiModule() {
                 }
             }
         }
-
+        healthCheckRoute()
     }
 }
 
