@@ -172,7 +172,11 @@ fun Application.apiModule() {
                 }
             }
         }
-
+        route("areYouAlive"){
+            get {
+                call.respondText(ContentType.Text.Plain){ "yea" }
+            }
+        }
 
     }
 }
