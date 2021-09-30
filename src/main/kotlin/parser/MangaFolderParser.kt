@@ -1,13 +1,13 @@
 package tlp.media.server.komga.parser
 
 import io.ktor.util.*
+import net.greypanther.natsort.SimpleNaturalComparator
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.exception.ParserException
 import tlp.media.server.komga.model.MangaFolder
 import tlp.media.server.komga.model.Page
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.*
 
 class MangaFolderParser(private val mangaFolderPath: Path) {
     private var id: String
@@ -20,10 +20,15 @@ class MangaFolderParser(private val mangaFolderPath: Path) {
 
     fun parse(): MangaFolder {
         val relevantFiles = scanForRelevantFile()
-        val imageList:List<Path> = relevantFiles.imageList.sortedWith(naturalOrder())
         val metaFile:Path = relevantFiles.metaFile
 
-        val pages = imageList
+        val imageFileComparator = kotlin.Comparator<Path> { pathLeft, pathRight ->
+            return@Comparator SimpleNaturalComparator.getInstance<String>()
+                .compare(pathLeft.fileName.toString(), pathRight.fileName.toString())
+        }
+
+        val pages = relevantFiles.imageList
+            .sortedWith(imageFileComparator)
             .mapIndexed { index, path ->
                 val fileName = path.fileName
                 val url = "$baseUrl/manga/$id/$fileName"
@@ -32,7 +37,6 @@ class MangaFolderParser(private val mangaFolderPath: Path) {
         val galleryInfo = MangaFolderMetaParser(metaFile).parse()
         return MangaFolder(id, galleryInfo, pages)
     }
-
 
     fun getId(): String {
         val fileName = mangaFolderPath.fileName!!.toString()
