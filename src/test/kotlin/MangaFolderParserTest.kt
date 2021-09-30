@@ -7,15 +7,19 @@ import tlp.media.server.komga.service.MangaFolderService
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class MangaFolderParserTest {
     private val workingDir: Path = Paths.get(Constant.galleryPath)
     private var testResources: TestResources? = null
+
     @BeforeAll
     fun setup() {
         testResources = TestResources(
             workingDir, listOf(
-                ZipFileEntry("test_manga_1.zip", "123tlp")
+                ZipFileEntry("test_manga_1.zip", "123tlp"),
+                ZipFileEntry("292_files.zip", "123tlp")
             )
         )
         DatabaseConfig.initialize()
@@ -62,5 +66,39 @@ HP:http://turuma.blog.fc2.com/
             { assertEquals(expected.title, mangaParsed.title) },
             { assertEquals(expected.url, mangaParsed.url) }
         )
+    }
+
+    @Test
+    @DisplayName("Test page indexing")
+    fun testPageIndexing() {
+        val pathString =
+            """${Constant.galleryPath}/manga [1926482]"""
+        val path = Paths.get(pathString)
+        val parse = MangaFolderParser(path).parse()
+        val indexedImages = parse.images
+
+        assertEquals(292, indexedImages.size)
+        assertTrue {
+            var found4 = false
+            var found10 = false
+            for ((_, page) in indexedImages) {
+                if (page.index == 4) {
+                    found4 = true
+                }
+                if (page.index == 10) {
+                    found10 = true
+                }
+            }
+            return@assertTrue found4 && found10
+        }
+
+        for ((file, page) in indexedImages) {
+            if (page.index == 4) {
+                assertEquals("05.png", file.fileName.toString())
+            }
+            if (page.index == 10) {
+                assertEquals("11.png", file.fileName.toString())
+            }
+        }
     }
 }
