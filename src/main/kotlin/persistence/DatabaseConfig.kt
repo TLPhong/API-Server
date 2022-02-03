@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory
 import tlp.media.server.komga.constant.Constant
 
 object DatabaseConfig {
+    val databaseFilePath = Constant.usageLogFilePath
     fun initialize(logLevel: Level = Level.INFO) {
-        val db = Database.connect("jdbc:sqlite:${Constant.databaseFilePath}", "org.sqlite.JDBC")
+        val db = Database.connect("jdbc:sqlite:$databaseFilePath", "org.sqlite.JDBC")
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
         root.level = logLevel
         transaction {

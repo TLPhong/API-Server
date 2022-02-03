@@ -37,10 +37,9 @@ class PropertiesReader {
     }
 }
 
+private val reader = PropertiesReader()
 
 object Constant {
-    private val reader = PropertiesReader()
-
     val port: Int = reader["port"]!!.toInt()
     val host: String = reader["host"]!!
     val baseApiPath: String = reader["baseApiPath"]!!
