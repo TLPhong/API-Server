@@ -56,7 +56,7 @@ object Constant {
     val baseApiPath: String = reader["baseApiPath"]!!
     val galleryPath: String = reader["galleryPath"]!!
     val baseUrl = "http://$host:$port/$baseApiPath"
-    val logLevel = reader["logLevel"] ?: "INFO"
+    val logLevel = reader["logLevel"]!!
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
 }
