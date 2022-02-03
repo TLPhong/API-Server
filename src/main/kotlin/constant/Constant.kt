@@ -18,10 +18,21 @@ class PropertiesReader {
 
     private fun loadFilePropertyFile() {
         val propertyFilePath = Path(propertyFile)
-        val reader = Files.newBufferedReader(propertyFilePath)
-        val properties = Properties()
-        properties.load(reader)
-        this.properties = properties
+        this.properties = if (Files.exists(propertyFilePath)) {
+            val reader = Files.newBufferedReader(propertyFilePath)
+            val properties = Properties()
+            properties.load(reader)
+            properties
+        } else {
+            Thread.currentThread()
+                .contextClassLoader
+                .getResourceAsStream("application.properties")
+                .use {
+                    val properties = Properties()
+                    properties.load(it)
+                    properties
+                }
+        }
     }
 
     private fun loadEnvProperty(key: String): String? {
