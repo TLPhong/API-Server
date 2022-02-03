@@ -5,11 +5,6 @@ import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IdTable
 import org.jetbrains.exposed.sql.Column
-import org.jetbrains.exposed.sql.SizedCollection
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.batchInsert
-import org.jetbrains.exposed.sql.transactions.transaction
-import tlp.media.server.komga.model.MangaFolder
 
 object MangaTable : IdTable<String>("mangas") {
     override val id: Column<EntityID<String>> = varchar("id", length = 100).entityId()

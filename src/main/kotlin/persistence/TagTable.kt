@@ -7,9 +7,6 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.SizedIterable
 import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.batchInsert
-import org.jetbrains.exposed.sql.transactions.transaction
-import tlp.media.server.komga.model.Tag
 
 object TagTable : IntIdTable("tags") {
     val name: Column<String> = varchar("name", length = 255)

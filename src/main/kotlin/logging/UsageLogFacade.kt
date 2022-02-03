@@ -1,6 +1,5 @@
 package logging
 
-import tlp.media.server.komga.logging.entity.Gallery
 import tlp.media.server.komga.logging.entity.Item
 import tlp.media.server.komga.logging.entity.Resource
 

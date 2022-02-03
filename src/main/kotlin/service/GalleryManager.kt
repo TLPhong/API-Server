@@ -1,7 +1,5 @@
 package tlp.media.server.komga.service
 
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -18,10 +16,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.TimeUnit
-import kotlin.collections.HashMap
+import kotlin.concurrent.schedule
 import kotlin.concurrent.thread
 import kotlin.streams.asSequence
-import kotlin.concurrent.schedule
 
 /***
  * Service that handle parsing/recurring parsing

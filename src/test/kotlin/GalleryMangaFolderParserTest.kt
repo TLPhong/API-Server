@@ -1,8 +1,6 @@
 import org.junit.jupiter.api.*
-import persistence.DatabaseConfig
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.parser.GalleryFolderParser
-import tlp.media.server.komga.service.MangaFolderService
 import java.nio.file.Path
 import java.nio.file.Paths
 
