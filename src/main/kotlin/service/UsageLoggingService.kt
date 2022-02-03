@@ -4,9 +4,6 @@ import logging.UsageLogFacade
 import mu.KotlinLogging
 import tlp.media.server.komga.logging.UsageLogFacadeImpl
 import tlp.media.server.komga.logging.entity.Action
-import tlp.media.server.komga.logging.entity.impl.GalleryImpl
-import tlp.media.server.komga.logging.entity.impl.ResourceImpl
-import tlp.media.server.komga.logging.toGallery
 import tlp.media.server.komga.logging.toItem
 import tlp.media.server.komga.logging.toResource
 import tlp.media.server.komga.model.MangaFolder

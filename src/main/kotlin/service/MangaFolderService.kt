@@ -1,14 +1,13 @@
 package tlp.media.server.komga.service
 
-import com.sun.org.apache.xpath.internal.operations.Bool
 import tlp.media.server.komga.exception.MangaNotFoundException
 import tlp.media.server.komga.model.*
 import java.io.File
 import java.nio.file.Path
-import kotlin.random.Random
-import java.util.Timer
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.schedule
+import kotlin.random.Random
 
 
 /**

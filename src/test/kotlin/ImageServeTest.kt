@@ -33,8 +33,8 @@ class ImageServeTest {
 
     @AfterAll
     fun tearDown() {
-        File(Constant.databaseFileName).delete()
-        File(Constant.usageLogFileName).delete()
+        File(Constant.databaseFilePath).delete()
+        File(Constant.usageLogFilePath).delete()
         testResources?.deleteGalleryDir()
     }
 

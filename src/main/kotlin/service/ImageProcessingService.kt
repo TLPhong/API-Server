@@ -1,6 +1,5 @@
 package tlp.media.server.komga.service
 
-import io.ktor.util.*
 import org.imgscalr.Scalr
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

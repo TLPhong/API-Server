@@ -8,7 +8,7 @@ import tlp.media.server.komga.logging.entity.Resource
 import java.io.File
 
 class UsageLogFacadeImpl : UsageLogFacade {
-    private val usageLogFile: File = File(Constant.usageLogFileName)
+    private val usageLogFile: File = File(Constant.usageLogFilePath)
     private val jsonMapper = jacksonObjectMapper()
 
     init {

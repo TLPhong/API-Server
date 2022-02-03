@@ -1,5 +1,4 @@
 import net.lingala.zip4j.ZipFile
-import java.io.Closeable
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
