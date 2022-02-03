@@ -1,6 +1,8 @@
 package tlp.media.server.komga.constant
 
+import java.nio.file.Files
 import java.util.Properties
+import kotlin.io.path.Path
 
 /**
  * Load order. application.properties < env
@@ -15,13 +17,22 @@ class PropertiesReader {
     }
 
     private fun loadFilePropertyFile() {
-        properties = Thread.currentThread().contextClassLoader
-            .getResourceAsStream(propertyFile)
-            .use {
-                val properties = Properties()
-                properties.load(it)
-                properties
-            }
+        val propertyFilePath = Path(propertyFile)
+        this.properties = if (Files.exists(propertyFilePath)) {
+            val reader = Files.newBufferedReader(propertyFilePath)
+            val properties = Properties()
+            properties.load(reader)
+            properties
+        } else {
+            Thread.currentThread()
+                .contextClassLoader
+                .getResourceAsStream("application.properties")
+                .use {
+                    val properties = Properties()
+                    properties.load(it)
+                    properties
+                }
+        }
     }
 
     private fun loadEnvProperty(key: String): String? {
@@ -45,7 +56,7 @@ object Constant {
     val baseApiPath: String = reader["baseApiPath"]!!
     val galleryPath: String = reader["galleryPath"]!!
     val baseUrl = "http://$host:$port/$baseApiPath"
-    val logLevel = reader["logLevel"] ?: "INFO"
+    val logLevel = reader["logLevel"]!!
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
 }
