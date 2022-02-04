@@ -47,7 +47,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  Build_docker_jar:
+  Build_docker:
     runs-on: ubuntu-20.04
     steps:
       - name: Build
