@@ -8,7 +8,6 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import tlp.media.server.komga.constant.Constant
-import java.io.File
 import java.sql.Connection
 
 object DatabaseConfig {
