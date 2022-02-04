@@ -42,7 +42,7 @@ jobs:
       - name: Publish
         uses: actions/upload-artifact@v2
         with:
-          name: Temporary artifacts
+          name: Jar artifacts
           path: ~/artifacts
           if-no-files-found: error
           retention-days: 1
@@ -65,7 +65,7 @@ jobs:
       - name: Publish
         uses: actions/upload-artifact@v2
         with:
-          name: Temporary artifacts
+          name: Docker artifacts
           path: ~/artifacts
           if-no-files-found: error
           retention-days: 1
