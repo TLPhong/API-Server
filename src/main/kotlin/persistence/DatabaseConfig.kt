@@ -8,26 +8,22 @@ import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.LoggerFactory
 import tlp.media.server.komga.constant.Constant
+import java.io.File
 import java.sql.Connection
 
-object DatabaseConfig{
-    private var db: Database? = null
+object DatabaseConfig {
     fun initialize(logLevel: Level = Level.INFO) {
         // Logger
         val root: Logger = LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME) as Logger
         root.level = logLevel
         // Db connection init
-        val db = if(Constant.databaseInMemory){
-            Database.connect("jdbc:sqlite:${Constant.databaseFilePath}", "org.sqlite.JDBC")
-        }else{
-            Database.connect("jdbc:sqlite:file:test?mode=memory&cache=shared", "org.sqlite.JDBC")
-        }
-        TransactionManager.manager.defaultIsolationLevel =  Connection.TRANSACTION_SERIALIZABLE
-        db.useNestedTransactions = false // Inner transaction will reuse outer context
+        val db = Database.connect("jdbc:sqlite:${Constant.databaseFilePath}", "org.sqlite.JDBC")
+        // Inner transaction will reuse outer context
+        TransactionManager.manager.defaultIsolationLevel = Connection.TRANSACTION_READ_UNCOMMITTED
+
         // Db Init Schema
-        transaction {
+        transaction(db) {
             SchemaUtils.create(MangaTable, ImageTable, TagTable, MangaTagTable)
         }
-        this.db = db
     }
 }
