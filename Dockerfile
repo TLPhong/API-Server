@@ -5,7 +5,7 @@ WORKDIR /app
 COPY . .
 
 RUN mvn --batch-mode clean validate
-RUN mvn --batch-mode package
+RUN mvn --batch-mode package -Dmaven.test.skip=true
 
 FROM openjdk:8-alpine as run
 
