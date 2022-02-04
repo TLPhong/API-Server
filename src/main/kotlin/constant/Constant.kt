@@ -51,11 +51,11 @@ class PropertiesReader {
 private val reader = PropertiesReader()
 
 object Constant {
-    val port: Int = reader["port"]!!.toInt()
-    val host: String = reader["host"]!!
-    val baseApiPath: String = reader["baseApiPath"]!!
-    val galleryPath: String = reader["galleryPath"]!!
-    val baseUrl = "http://$host:$port/$baseApiPath"
+    val port = reader["port"]!!.toInt()
+    val host = reader["host"]!!
+    val baseApiPath = reader["baseApiPath"]!!
+    val galleryPath = reader["galleryPath"]!!
+    val baseUrl = reader["baseUrl"]!!
     val logLevel = reader["logLevel"]!!
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
