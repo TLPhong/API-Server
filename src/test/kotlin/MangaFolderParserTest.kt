@@ -4,6 +4,7 @@ import tlp.media.server.komga.parser.MangaFolderParser
 import tlp.media.server.komga.model.Manga
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.service.MangaFolderService
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -29,6 +30,8 @@ class MangaFolderParserTest {
     @AfterAll
     fun tearDown() {
         testResources?.deleteGalleryDir()
+        File(Constant.databaseFilePath).delete()
+        File(Constant.usageLogFilePath).delete()
     }
 
     @Test

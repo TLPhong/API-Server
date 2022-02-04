@@ -1,3 +1,4 @@
+import ch.qos.logback.classic.Level
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.*
@@ -7,6 +8,7 @@ import persistence.MangaEntity
 import persistence.TagEntity
 import tlp.media.server.komga.constant.Constant
 import tlp.media.server.komga.service.GalleryManager
+import java.io.File
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.test.assertEquals
@@ -25,15 +27,15 @@ class PersistenceTest {
                 ZipFileEntry("test_manga_2.zip", "123tlp")
             )
         )
-        DatabaseConfig.initialize()
-        runBlocking {
-            GalleryManager.instance.initialize(waitDbSync = true)
-        }
+        DatabaseConfig.initialize(Level.TRACE)
+        GalleryManager.instance.initialize(waitDbSync = true)
     }
 
     @AfterAll
     fun tearDown() {
         testResources?.deleteGalleryDir()
+        File(Constant.usageLogFilePath).delete()
+        File(Constant.databaseFilePath).delete()
     }
 
     @Test
