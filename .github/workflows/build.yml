@@ -1,4 +1,4 @@
-name: Buid and deploy
+name: Buid Jar and Docker
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build_maven:
+  Build_maven_jar:
     runs-on: ubuntu-20.04
     steps:
       - name: Clean workspace after
@@ -37,6 +37,29 @@ jobs:
         run: |
           mkdir ~/artifacts
           mv target/ApiServer-1.0-jar-with-dependencies.jar ~/artifacts/KomgaAPI.jar
+          ls -lah ~/artifacts
+
+      - name: Publish
+        uses: actions/upload-artifact@v2
+        with:
+          name: Temporary artifacts
+          path: ~/artifacts
+          if-no-files-found: error
+          retention-days: 1
+
+  Build_docker_jar:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Build
+        run: docker build . --tag tlp-api-server-${{ github.run_id }}
+
+      - name: Save image
+        run: docker image save tlp-api-server-${{ github.run_id }} -o tlp-api-server-${{ github.run_id }}.tar
+
+      - name: Move to actifacts folder
+        run: |
+          mkdir ~/artifacts
+          mv tlp-api-server-${{ github.run_id }}.tar ~/artifacts/tlp-api-server.tar
           ls -lah ~/artifacts
 
       - name: Publish
