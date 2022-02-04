@@ -50,6 +50,12 @@ jobs:
   Build_docker:
     runs-on: ubuntu-20.04
     steps:
+      - name: Clean workspace after
+        uses: mickem/clean-after-action@v1
+
+      - name: Setup workspace
+        uses: actions/checkout@v2
+
       - name: Build
         run: docker build . --tag tlp-api-server-${{ github.run_id }}
 
