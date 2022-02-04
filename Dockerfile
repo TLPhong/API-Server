@@ -11,7 +11,8 @@ FROM openjdk:8-alpine as run
 
 ENV port 8080
 ENV host localhost
-ENV baseUrl http://localhost:8080
+ENV baseApiPath api
+ENV baseUrl http://localhost:8080/api
 ENV galleryPath /gallery
 ENV databaseFilePath /data/data.db
 ENV usageLogFilePath /data/usage.jsonl
