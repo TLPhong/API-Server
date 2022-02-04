@@ -28,7 +28,6 @@ class MangaFolderParserTest {
 
     @AfterAll
     fun tearDown() {
-        Paths.get(DatabaseConfig.databaseFilePath).toFile().delete()
         testResources?.deleteGalleryDir()
     }
 
