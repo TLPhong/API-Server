@@ -34,7 +34,6 @@ class PersistenceTest {
     @AfterAll
     fun tearDown() {
         testResources?.deleteGalleryDir()
-        Paths.get(DatabaseConfig.databaseFilePath).toFile().delete()
     }
 
     @Test
