@@ -59,5 +59,6 @@ object Constant {
     val logLevel = reader["logLevel"]!!
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
+    val useCache = reader["useCache"]!!.toBoolean()
 }
 

@@ -3,6 +3,7 @@ package tlp.media.server.komga.service
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import io.ktor.util.*
+import tlp.media.server.komga.constant.Constant
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.concurrent.TimeUnit
@@ -13,6 +14,7 @@ class ImageReaderService private constructor() {
     }
 
     private val imageProcessingService by lazy { ImageProcessingService.instance }
+    private val useCache = Constant.useCache
 
     private val cache: Cache<String, ByteArray> = Caffeine.newBuilder()
         .maximumSize(20)
@@ -28,11 +30,17 @@ class ImageReaderService private constructor() {
     }
 
     private fun loadImage(path: Path): ByteArray {
-        return cache.get(path.toString()){
+        return if (useCache) {
             Files.newInputStream(path).use { stream ->
                 stream.readBytes()
             }
-        }!!
+        } else {
+            cache.get(path.toString()) {
+                Files.newInputStream(path).use { stream ->
+                    stream.readBytes()
+                }
+            }!!
+        }
     }
 
     private fun loadCompressed(path: Path): ByteArray {
