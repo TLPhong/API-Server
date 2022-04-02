@@ -60,5 +60,6 @@ object Constant {
     val databaseInMemory = reader["databaseInMemory"]!!.toBoolean()
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
+    val useCache = reader["useCache"]!!.toBoolean()
 }
 

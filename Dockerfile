@@ -1,11 +1,13 @@
 # Build stage
 FROM maven:3.8-openjdk-8 as build
 
-WORKDIR /app
+WORKDIR /build
 COPY . .
 
 RUN mvn --batch-mode clean validate
 RUN mvn --batch-mode package -Dmaven.test.skip=true
+
+COPY ./ApiServer-1.0-jar-with-dependencies.jar ./ApiServer.jar
 
 FROM openjdk:8-alpine as run
 
@@ -21,6 +23,6 @@ VOLUME /data
 
 WORKDIR /app
 
-COPY --from=build /app/target/ApiServer-1.0-jar-with-dependencies.jar ./ApiServer.jar
+COPY --from=build /build/ApiServer.jar ./ApiServer.jar
 
 CMD ["java", "-jar", "ApiServer.jar"]
