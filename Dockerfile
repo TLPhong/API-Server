@@ -7,7 +7,7 @@ COPY . .
 RUN mvn --batch-mode clean validate
 RUN mvn --batch-mode package -Dmaven.test.skip=true
 
-COPY ./ApiServer-1.0-jar-with-dependencies.jar ./ApiServer.jar
+RUN mv -v ./target/ApiServer-1.0-jar-with-dependencies.jar ./ApiServer.jar
 
 FROM openjdk:8-alpine as run
 
