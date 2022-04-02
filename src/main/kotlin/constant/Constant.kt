@@ -57,7 +57,6 @@ object Constant {
     val galleryPath = reader["galleryPath"]!!
     val baseUrl = reader["baseUrl"]!!
     val logLevel = reader["logLevel"]!!
-    val databaseInMemory = reader["databaseInMemory"]!!.toBoolean()
     val databaseFilePath = reader["databaseFilePath"]!!
     val usageLogFilePath = reader["usageLogFilePath"]!!
     val useCache = reader["useCache"]!!.toBoolean()
