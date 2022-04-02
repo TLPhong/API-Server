@@ -31,15 +31,15 @@ class ImageReaderService private constructor() {
 
     private fun loadImage(path: Path): ByteArray {
         return if (useCache) {
-            Files.newInputStream(path).use { stream ->
-                stream.readBytes()
-            }
-        } else {
             cache.get(path.toString()) {
                 Files.newInputStream(path).use { stream ->
                     stream.readBytes()
                 }
             }!!
+        } else {
+            Files.newInputStream(path).use { stream ->
+                stream.readBytes()
+            }
         }
     }
 
